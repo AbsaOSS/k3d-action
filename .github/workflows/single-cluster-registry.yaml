@@ -12,7 +12,7 @@ jobs:
         id: single-cluster
         name: "Create single k3d Cluster with Registry"
         with:
-          k3d-name: "test-cluster-1"
+          k3d-cluster-name: "test-cluster-1"
           k3d-registry: true
           k3d-args: >-
             --agents 1

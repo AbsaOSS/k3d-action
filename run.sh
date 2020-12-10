@@ -30,7 +30,7 @@ usage(){
 
   Environment variables:
       deploy
-                        K3D_NAME (Required) k3d cluster name.
+                        K3D_CLUSTER_NAME (Required) k3d cluster name.
 
                         K3D_ARGS (Optional) k3d arguments.
 
@@ -51,8 +51,14 @@ usage(){
 EOF
 }
 
+panic() {
+  (>&2 echo -e " - ${RED}$*${NC}")
+  usage
+  exit 1
+}
+
 deploy(){
-    local name=${K3D_NAME}
+    local name=${K3D_CLUSTER_NAME}
     local arguments=${K3D_ARGS:-}
     local network=${K3D_NETWORK:-$DEFAULT_NETWORK}
     local subnet=${K3D_SUBNET:-$DEFAULT_SUBNET}
@@ -155,8 +161,8 @@ if [[ -z "${NO_COLOR}" ]]; then
       NC="\033[0m"
       RED="\033[0;91m"
 fi
-if [[ -z "${K3D_NAME}" ]]; then
-  panic "K3D_NAME must be set"
+if [[ -z "${K3D_CLUSTER_NAME}" ]]; then
+  panic "K3D_CLUSTER_NAME must be set"
 fi
 
 #######################

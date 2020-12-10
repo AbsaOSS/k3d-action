@@ -12,7 +12,7 @@ jobs:
         id: test-cluster-1
         name: "Create 1st k3d Cluster"
         with:
-          k3d-name: "test-cluster-1"
+          k3d-cluster-name: "test-cluster-1"
           k3d-args: >-
             -p "80:80@agent[0]"
             -p "443:443@agent[0]"
@@ -24,7 +24,7 @@ jobs:
         id: test-cluster-2
         name: "Create 2nd k3d Cluster"
         with:
-          k3d-name: "test-cluster-2"
+          k3d-cluster-name: "test-cluster-2"
           k3d-args: >-
             -p "81:80@agent[0]"
             -p "444:443@agent[0]"

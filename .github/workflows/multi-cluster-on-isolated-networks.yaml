@@ -11,7 +11,7 @@ jobs:
       - uses: ./
         name: "Create 1st k3d Cluster in 172.20.0.0/24"
         with:
-          k3d-name: "test-cluster-1"
+          k3d-cluster-name: "test-cluster-1"
           k3d-network: "nw01"
           k3d-subnet: "172.20.0.0/24"
           k3d-args: >-
@@ -25,7 +25,7 @@ jobs:
       - uses: ./
         name: "Create 1nd k3d Cluster in 172.20.1.0/24"
         with:
-          k3d-name: "test-cluster-2"
+          k3d-cluster-name: "test-cluster-2"
           k3d-network: "nw02"
           k3d-subnet: "172.20.1.0/24"
           k3d-args: >-

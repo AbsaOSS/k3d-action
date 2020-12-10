@@ -12,7 +12,7 @@ jobs:
         id: test-cluster-1-a
         name: "Create 1st k3d Cluster in 172.20.0.0/24 with Registry"
         with:
-          k3d-name: "test-cluster-1-a"
+          k3d-cluster-name: "test-cluster-1-a"
           k3d-network: "nw01"
           k3d-subnet: "172.20.0.0/24"
           k3d-registry: true
@@ -25,7 +25,7 @@ jobs:
         id: test-cluster-1-b
         name: "Create 2nd k3d Cluster in 172.20.0.0/24 with Registry"
         with:
-          k3d-name: "test-cluster-2-a"
+          k3d-cluster-name: "test-cluster-2-a"
           k3d-network: "nw01"
           k3d-registry: true
           k3d-args: >-
@@ -37,7 +37,7 @@ jobs:
         id: test-cluster-2-a
         name: "Create 1st k3d Cluster in 172.20.1.0/24 with Registry"
         with:
-          k3d-name: "test-cluster-1-b"
+          k3d-cluster-name: "test-cluster-1-b"
           k3d-network: "nw02"
           k3d-subnet: "172.20.1.0/24"
           k3d-registry: true
@@ -50,7 +50,7 @@ jobs:
         id: test-cluster-2-b
         name: "Create 2nd k3d Cluster in 172.20.1.0/24 with Registry"
         with:
-          k3d-name: "test-cluster-2-b"
+          k3d-cluster-name: "test-cluster-2-b"
           k3d-network: "nw02"
           k3d-registry: true
           k3d-args: >-
