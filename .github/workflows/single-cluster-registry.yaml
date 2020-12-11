@@ -12,15 +12,15 @@ jobs:
         id: single-cluster
         name: "Create single k3d Cluster with Registry"
         with:
-          k3d-cluster-name: "test-cluster-1"
-          k3d-registry: true
-          k3d-args: >-
+          cluster-name: "test-cluster-1"
+          use-default-registry: true
+          args: >-
             --agents 1
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
       - name: Cluster info
         run: |
-          echo ${{ steps.single-cluster.outputs.k3d-network }} ${{ steps.single-cluster.outputs.k3d-subnet }}
+          echo ${{ steps.single-cluster.outputs.network }} ${{ steps.single-cluster.outputs.subnet-CIDR }}
           echo
           kubectl cluster-info --context k3d-test-cluster-1
       - name: Nodes

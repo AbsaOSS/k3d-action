@@ -12,8 +12,8 @@ jobs:
         id: single-cluster
         name: "Create single k3d Cluster"
         with:
-          k3d-cluster-name: "test-cluster-1"
-          k3d-args: >-
+          cluster-name: "test-cluster-1"
+          args: >-
             -p "80:80@agent[0]"
             -p "443:443@agent[0]"
             -p "5053:53/udp@agent[0]"
@@ -22,7 +22,7 @@ jobs:
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
       - name: Cluster info
         run: |
-          echo ${{ steps.single-cluster.outputs.k3d-network }} ${{ steps.single-cluster.outputs.k3d-subnet }}
+          echo ${{ steps.single-cluster.outputs.network }} ${{ steps.single-cluster.outputs.subnet-CIDR }}
           echo
           kubectl cluster-info --context k3d-test-cluster-1
       - name: Nodes

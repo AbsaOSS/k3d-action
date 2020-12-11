@@ -12,9 +12,9 @@ jobs:
         id: test-cluster-1
         name: "Create 1st k3d Cluster with Registry"
         with:
-          k3d-cluster-name: "test-cluster-1"
-          k3d-registry: true
-          k3d-args: >-
+          cluster-name: "test-cluster-1"
+          use-default-registry: true
+          args: >-
             --agents 1
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
@@ -22,17 +22,17 @@ jobs:
         id: test-cluster-2
         name: "Create 2nd k3d Cluster with Registry"
         with:
-          k3d-cluster-name: "test-cluster-2"
-          k3d-registry: true
-          k3d-args: >-
+          cluster-name: "test-cluster-2"
+          use-default-registry: true
+          args: >-
             --agents 1
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
       - name: Cluster info
         run: |
-          echo test-cluster-1: ${{ steps.test-cluster-1.outputs.k3d-network }} ${{ steps.test-cluster-1.outputs.k3d-subnet }}
-          echo test-cluster-2: ${{ steps.test-cluster-2.outputs.k3d-network }} ${{ steps.test-cluster-2.outputs.k3d-subnet }}
+          echo test-cluster-1: ${{ steps.test-cluster-1.outputs.network }} ${{ steps.test-cluster-1.outputs.subnet-CIDR }}
+          echo test-cluster-2: ${{ steps.test-cluster-2.outputs.network }} ${{ steps.test-cluster-2.outputs.subnet-CIDR }}
           echo
           kubectl cluster-info --context k3d-test-cluster-1 && kubectl cluster-info --context k3d-test-cluster-2
       - name: Nodes

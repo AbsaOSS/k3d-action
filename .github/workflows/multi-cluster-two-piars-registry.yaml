@@ -12,11 +12,11 @@ jobs:
         id: test-cluster-1-a
         name: "Create 1st k3d Cluster in 172.20.0.0/24 with Registry"
         with:
-          k3d-cluster-name: "test-cluster-1-a"
-          k3d-network: "nw01"
-          k3d-subnet: "172.20.0.0/24"
-          k3d-registry: true
-          k3d-args: >-
+          cluster-name: "test-cluster-1-a"
+          network: "nw01"
+          subnet-CIDR: "172.20.0.0/24"
+          use-default-registry: true
+          args: >-
             --agents 1
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
@@ -25,10 +25,10 @@ jobs:
         id: test-cluster-1-b
         name: "Create 2nd k3d Cluster in 172.20.0.0/24 with Registry"
         with:
-          k3d-cluster-name: "test-cluster-2-a"
-          k3d-network: "nw01"
-          k3d-registry: true
-          k3d-args: >-
+          cluster-name: "test-cluster-2-a"
+          network: "nw01"
+          use-default-registry: true
+          args: >-
             --agents 1
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
@@ -37,11 +37,11 @@ jobs:
         id: test-cluster-2-a
         name: "Create 1st k3d Cluster in 172.20.1.0/24 with Registry"
         with:
-          k3d-cluster-name: "test-cluster-1-b"
-          k3d-network: "nw02"
-          k3d-subnet: "172.20.1.0/24"
-          k3d-registry: true
-          k3d-args: >-
+          cluster-name: "test-cluster-1-b"
+          network: "nw02"
+          subnet-CIDR: "172.20.1.0/24"
+          use-default-registry: true
+          args: >-
             --agents 1
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
@@ -50,10 +50,10 @@ jobs:
         id: test-cluster-2-b
         name: "Create 2nd k3d Cluster in 172.20.1.0/24 with Registry"
         with:
-          k3d-cluster-name: "test-cluster-2-b"
-          k3d-network: "nw02"
-          k3d-registry: true
-          k3d-args: >-
+          cluster-name: "test-cluster-2-b"
+          network: "nw02"
+          use-default-registry: true
+          args: >-
             --agents 1
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
@@ -61,10 +61,10 @@ jobs:
       - name: Cluster info
         run: |
           echo
-          echo test-cluster-1-a: ${{ steps.test-cluster-1-a.outputs.k3d-network }} ${{ steps.test-cluster-1-a.outputs.k3d-subnet }}
-          echo test-cluster-1-b: ${{ steps.test-cluster-1-b.outputs.k3d-network }} ${{ steps.test-cluster-1-b.outputs.k3d-subnet }}
-          echo test-cluster-2-a: ${{ steps.test-cluster-2-a.outputs.k3d-network }} ${{ steps.test-cluster-2-a.outputs.k3d-subnet }}
-          echo test-cluster-2-b: ${{ steps.test-cluster-2-b.outputs.k3d-network }} ${{ steps.test-cluster-2-b.outputs.k3d-subnet }}
+          echo test-cluster-1-a: ${{ steps.test-cluster-1-a.outputs.network }} ${{ steps.test-cluster-1-a.outputs.subnet-CIDR }}
+          echo test-cluster-1-b: ${{ steps.test-cluster-1-b.outputs.network }} ${{ steps.test-cluster-1-b.outputs.subnet-CIDR }}
+          echo test-cluster-2-a: ${{ steps.test-cluster-2-a.outputs.network }} ${{ steps.test-cluster-2-a.outputs.subnet-CIDR }}
+          echo test-cluster-2-b: ${{ steps.test-cluster-2-b.outputs.network }} ${{ steps.test-cluster-2-b.outputs.subnet-CIDR }}
           echo
           kubectl cluster-info --context k3d-test-cluster-1-a
           kubectl cluster-info --context k3d-test-cluster-2-a

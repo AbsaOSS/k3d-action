@@ -6,32 +6,32 @@ branding:
   icon: grid
   color: red
 inputs:
-  k3d-cluster-name:
+  cluster-name:
     description: "(Required) Cluster name."
     required: true
-  k3d-args:
+  args:
     description: "(Optional) Additional arguments to k3d cluster. see: https://k3d.io/usage/commands/"
     required: false
-  k3d-network:
+  network:
     description: "(Optional) Cluster network. Default value k3d-action-bridge-network"
     required: false
-  k3d-subnet:
-    description: "(Optional) Cluster subnet CIDR. Default value 172.16.0.0/24 in case k3d-network is not set."
+  subnet-CIDR:
+    description: "(Optional) Cluster subnet CIDR. Default value 172.16.0.0/24 in case network is not set."
     required: false
-  k3d-registry:
+  use-default-registry:
     description: "(Optional) Autogenerate docker registry accessible from the cluster."
     required: false
     default: "false"
-  k3d-registry-config-path:
+  override-registry-config-path:
     description: "(Optional) Path to custom registry configuration file. Variable requires K3D_REGISTRY to be true."
     required: false
 outputs:
-  k3d-network:
+  network:
     description: "Detected k3d version"
-    value: ${{ steps.main.outputs.k3d-network }}
-  k3d-subnet:
+    value: ${{ steps.main.outputs.network }}
+  subnet-CIDR:
     description: "Detected k3d network subnet"
-    value: ${{ steps.main.outputs.k3d-subnet }}
+    value: ${{ steps.main.outputs.subnet-CIDR }}
 runs:
   using: composite
   steps:
@@ -39,9 +39,9 @@ runs:
       shell: bash
       run: ${{ github.action_path }}/run.sh deploy
       env:
-        K3D_CLUSTER_NAME: ${{ inputs.k3d-cluster-name }}
-        K3D_ARGS: ${{ inputs.k3d-args }}
-        K3D_NETWORK: ${{ inputs.k3d-network }}
-        K3D_SUBNET: ${{ inputs.k3d-subnet }}
-        K3D_REGISTRY: ${{ inputs.k3d-registry }}
-        K3D_REGISTRY_CONFIG_PATH: ${{ inputs.k3d-registry-config-path }}
+        K3D_CLUSTER_NAME: ${{ inputs.cluster-name }}
+        K3D_ARGS: ${{ inputs.args }}
+        K3D_NETWORK: ${{ inputs.network }}
+        K3D_SUBNET: ${{ inputs.subnet-CIDR }}
+        K3D_REGISTRY: ${{ inputs.use-default-registry }}
+        K3D_REGISTRY_CONFIG_PATH: ${{ inputs.override-registry-config-path }}

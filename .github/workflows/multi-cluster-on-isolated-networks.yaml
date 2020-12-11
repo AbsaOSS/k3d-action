@@ -11,10 +11,10 @@ jobs:
       - uses: ./
         name: "Create 1st k3d Cluster in 172.20.0.0/24"
         with:
-          k3d-cluster-name: "test-cluster-1"
-          k3d-network: "nw01"
-          k3d-subnet: "172.20.0.0/24"
-          k3d-args: >-
+          cluster-name: "test-cluster-1"
+          network: "nw01"
+          subnet-CIDR: "172.20.0.0/24"
+          args: >-
             -p "80:80@agent[0]"
             -p "443:443@agent[0]"
             -p "5053:53/udp@agent[0]"
@@ -25,10 +25,10 @@ jobs:
       - uses: ./
         name: "Create 1nd k3d Cluster in 172.20.1.0/24"
         with:
-          k3d-cluster-name: "test-cluster-2"
-          k3d-network: "nw02"
-          k3d-subnet: "172.20.1.0/24"
-          k3d-args: >-
+          cluster-name: "test-cluster-2"
+          network: "nw02"
+          subnet-CIDR: "172.20.1.0/24"
+          args: >-
             -p "81:80@agent[0]"
             -p "444:443@agent[0]"
             -p "5054:53/udp@agent[0]"
@@ -38,8 +38,8 @@ jobs:
 
       - name: Cluster info
         run: |
-          echo test-cluster-1: ${{ steps.test-cluster-1.outputs.k3d-network }} ${{ steps.test-cluster-1.outputs.k3d-subnet }}
-          echo test-cluster-2: ${{ steps.test-cluster-2.outputs.k3d-network }} ${{ steps.test-cluster-2.outputs.k3d-subnet }}
+          echo test-cluster-1: ${{ steps.test-cluster-1.outputs.network }} ${{ steps.test-cluster-1.outputs.subnet-CIDR }}
+          echo test-cluster-2: ${{ steps.test-cluster-2.outputs.network }} ${{ steps.test-cluster-2.outputs.subnet-CIDR }}
           echo
           kubectl cluster-info --context k3d-test-cluster-1 && kubectl cluster-info --context k3d-test-cluster-2
       - name: Nodes
