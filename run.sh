@@ -30,22 +30,22 @@ usage(){
 
   Environment variables:
       deploy
-                        K3D_CLUSTER_NAME (Required) k3d cluster name.
+                        CLUSTER_NAME (Required) k3d cluster name.
 
-                        K3D_ARGS (Optional) k3d arguments.
+                        ARGS (Optional) k3d arguments.
 
-                        K3D_NETWORK (Optional) If not set than default k3d-action-bridge-network is created
+                        NETWORK (Optional) If not set than default k3d-action-bridge-network is created
                                                and all clusters share that network.
 
-                        K3D_SUBNET (Optional) If not set than default 172.16.0.0/24 is used. Variable requires
-                                              K3D_NETWORK to be set.
+                        SUBNET_CIDR (Optional) If not set than default 172.16.0.0/24 is used. Variable requires
+                                              NETWORK to be set.
 
-                        K3D_REGISTRY (Optional) If not set than default false. If true provides local docker registry
+                        USE_DEFAULT_REGISTRY (Optional) If not set than default false. If true provides local docker registry
                                               registry.localhost:5000 without TLS and authentication.
 
-                        K3D_REGISTRY_CONFIG_PATH (Optional) Path to custom registry configuration file.
+                        OVERRIDE_REGISTRY_CONFIG_PATH (Optional) Path to custom registry configuration file.
                                               see: https://rancher.com/docs/k3s/latest/en/installation/private-registry/#mirrors
-                                              Variable requires K3D_REGISTRY to be true.
+                                              Variable requires USE_DEFAULT_REGISTRY to be true.
 
 
 EOF
@@ -58,11 +58,11 @@ panic() {
 }
 
 deploy(){
-    local name=${K3D_CLUSTER_NAME}
-    local arguments=${K3D_ARGS:-}
-    local network=${K3D_NETWORK:-$DEFAULT_NETWORK}
-    local subnet=${K3D_SUBNET:-$DEFAULT_SUBNET}
-    local registry=${K3D_REGISTRY:-}
+    local name=${CLUSTER_NAME}
+    local arguments=${ARGS:-}
+    local network=${NETWORK:-$DEFAULT_NETWORK}
+    local subnet=${SUBNET_CIDR:-$DEFAULT_SUBNET}
+    local registry=${USE_DEFAULT_REGISTRY:-}
     local registryArg
 
     existing_network=$(docker network list | awk '   {print $2 }' | grep -w "^$network$" || echo $NOT_FOUND)
@@ -129,10 +129,10 @@ registry(){
     fi
 }
 
-# depending on K3D_REGISTRY_CONFIG_PATH inject given or predefined configuration
+# depending on OVERRIDE_REGISTRY_CONFIG_PATH inject given or predefined configuration
 # see: https://rancher.com/docs/k3s/latest/en/installation/private-registry/#mirrors
 inject_configuration(){
-  local registry=${K3D_REGISTRY_CONFIG_PATH:-$REGISTRY_CONFIG_PATH}
+  local registry=${OVERRIDE_REGISTRY_CONFIG_PATH:-$REGISTRY_CONFIG_PATH}
   if [[ "$registry" == "$REGISTRY_CONFIG_PATH" ]]
   then
    cat > "${REGISTRY_CONFIG_PATH}" <<EOF
@@ -161,8 +161,8 @@ if [[ -z "${NO_COLOR}" ]]; then
       NC="\033[0m"
       RED="\033[0;91m"
 fi
-if [[ -z "${K3D_CLUSTER_NAME}" ]]; then
-  panic "K3D_CLUSTER_NAME must be set"
+if [[ -z "${CLUSTER_NAME}" ]]; then
+  panic "CLUSTER_NAME must be set"
 fi
 
 #######################

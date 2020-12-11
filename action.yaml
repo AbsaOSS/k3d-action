@@ -23,7 +23,7 @@ inputs:
     required: false
     default: "false"
   override-registry-config-path:
-    description: "(Optional) Path to custom registry configuration file. Variable requires K3D_REGISTRY to be true."
+    description: "(Optional) Path to custom registry configuration file. Variable requires USE_DEFAULT_REGISTRY to be true."
     required: false
 outputs:
   network:
@@ -39,9 +39,9 @@ runs:
       shell: bash
       run: ${{ github.action_path }}/run.sh deploy
       env:
-        K3D_CLUSTER_NAME: ${{ inputs.cluster-name }}
-        K3D_ARGS: ${{ inputs.args }}
-        K3D_NETWORK: ${{ inputs.network }}
-        K3D_SUBNET: ${{ inputs.subnet-CIDR }}
-        K3D_REGISTRY: ${{ inputs.use-default-registry }}
-        K3D_REGISTRY_CONFIG_PATH: ${{ inputs.override-registry-config-path }}
+        CLUSTER_NAME: ${{ inputs.cluster-name }}
+        ARGS: ${{ inputs.args }}
+        NETWORK: ${{ inputs.network }}
+        SUBNET_CIDR: ${{ inputs.subnet-CIDR }}
+        USE_DEFAULT_REGISTRY: ${{ inputs.use-default-registry }}
+        OVERRIDE_REGISTRY_CONFIG_PATH: ${{ inputs.override-registry-config-path }}
