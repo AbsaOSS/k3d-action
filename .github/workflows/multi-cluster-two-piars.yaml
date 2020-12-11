@@ -1,0 +1,88 @@
+name: Multi cluster; two pairs of clusters on two isolated networks
+
+on:
+  [workflow_dispatch, push]
+jobs:
+  k3d-multicluster-demo:
+    name: Two pairs of clusters on two isolated networks
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        id: test-cluster-1-a
+        name: "Create 1st k3d Cluster in 172.20.0.0/24"
+        with:
+          cluster-name: "test-cluster-1-a"
+          network: "nw01"
+          subnet-CIDR: "172.20.0.0/24"
+          args: >-
+            --agents 3
+            --no-lb
+            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+
+      - uses: ./
+        id: test-cluster-1-b
+        name: "Create 2nd k3d Cluster in 172.20.0.0/24"
+        with:
+          cluster-name: "test-cluster-2-a"
+          network: "nw01"
+          args: >-
+            --agents 3
+            --no-lb
+            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+
+      - uses: ./
+        id: test-cluster-2-a
+        name: "Create 1st k3d Cluster in 172.20.1.0/24"
+        with:
+          cluster-name: "test-cluster-1-b"
+          network: "nw02"
+          subnet-CIDR: "172.20.1.0/24"
+          args: >-
+            --agents 3
+            --no-lb
+            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+
+      - uses: ./
+        id: test-cluster-2-b
+        name: "Create 2nd k3d Cluster in 172.20.1.0/24"
+        with:
+          cluster-name: "test-cluster-2-b"
+          network: "nw02"
+          args: >-
+            --agents 3
+            --no-lb
+            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+
+      - name: Cluster info
+        run: |
+          echo
+          echo test-cluster-1-a: ${{ steps.test-cluster-1-a.outputs.network }} ${{ steps.test-cluster-1-a.outputs.subnet-CIDR }}
+          echo test-cluster-1-b: ${{ steps.test-cluster-1-b.outputs.network }} ${{ steps.test-cluster-1-b.outputs.subnet-CIDR }}
+          echo test-cluster-2-a: ${{ steps.test-cluster-2-a.outputs.network }} ${{ steps.test-cluster-2-a.outputs.subnet-CIDR }}
+          echo test-cluster-2-b: ${{ steps.test-cluster-2-b.outputs.network }} ${{ steps.test-cluster-2-b.outputs.subnet-CIDR }}
+          echo
+          kubectl cluster-info --context k3d-test-cluster-1-a
+          kubectl cluster-info --context k3d-test-cluster-2-a
+          kubectl cluster-info --context k3d-test-cluster-1-b
+          kubectl cluster-info --context k3d-test-cluster-2-b
+
+      - name: Nodes
+        # hack, wait until all agents are ready.
+        run: |
+          docker ps -a
+          sleep 5
+          kubectl config use-context k3d-test-cluster-1-a
+          kubectl get nodes -o wide
+          kubectl config use-context k3d-test-cluster-1-b
+          kubectl get nodes -o wide
+          kubectl config use-context k3d-test-cluster-2-a
+          kubectl get nodes -o wide
+          kubectl config use-context k3d-test-cluster-2-b
+          kubectl get nodes -o wide
+
+      - name: Network
+        run: |
+          docker network list
+          docker network inspect nw01
+          docker network inspect nw02

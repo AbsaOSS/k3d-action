@@ -1,0 +1,47 @@
+name: Setup K3d
+description: Easy to use GitHub action allows you to test single/multi-cluster apps with additional private registry support.
+author: AbsaOSS
+# see: https://haya14busa.github.io/github-action-brandings/
+branding:
+  icon: grid
+  color: red
+inputs:
+  cluster-name:
+    description: "(Required) Cluster name."
+    required: true
+  args:
+    description: "(Optional) Additional arguments to k3d cluster. see: https://k3d.io/usage/commands/"
+    required: false
+  network:
+    description: "(Optional) Cluster network. Default value k3d-action-bridge-network"
+    required: false
+  subnet-CIDR:
+    description: "(Optional) Cluster subnet CIDR. Default value 172.16.0.0/24 in case network is not set."
+    required: false
+  use-default-registry:
+    description: "(Optional) Autogenerate docker registry accessible from the cluster."
+    required: false
+    default: "false"
+  override-registry-config-path:
+    description: "(Optional) Path to custom registry configuration file. Variable requires USE_DEFAULT_REGISTRY to be true."
+    required: false
+outputs:
+  network:
+    description: "Detected k3d version"
+    value: ${{ steps.main.outputs.network }}
+  subnet-CIDR:
+    description: "Detected k3d network subnet"
+    value: ${{ steps.main.outputs.subnet-CIDR }}
+runs:
+  using: composite
+  steps:
+    - id: main
+      shell: bash
+      run: ${{ github.action_path }}/run.sh deploy
+      env:
+        CLUSTER_NAME: ${{ inputs.cluster-name }}
+        ARGS: ${{ inputs.args }}
+        NETWORK: ${{ inputs.network }}
+        SUBNET_CIDR: ${{ inputs.subnet-CIDR }}
+        USE_DEFAULT_REGISTRY: ${{ inputs.use-default-registry }}
+        OVERRIDE_REGISTRY_CONFIG_PATH: ${{ inputs.override-registry-config-path }}

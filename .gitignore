@@ -1,0 +1,13 @@
+# Ignore everything
+*
+
+# But not these files...
+!CODEOWNERS
+!LICENSE
+!README.md
+!.gitignore
+!run.sh
+!*.yaml
+
+# ...even if they are in subdirectories
+!*/
