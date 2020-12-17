@@ -1,0 +1,59 @@
+name: Multi cluster; two clusters on two isolated networks
+
+on:
+  [workflow_dispatch, push]
+jobs:
+  k3d-multicluster-demo:
+    name: Two clusters on two isolated networks
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        id: test-cluster-1
+        name: "Create 1st k3d Cluster in 172.20.0.0/24"
+        with:
+          cluster-name: "test-cluster-1"
+          network: "nw01"
+          subnet-CIDR: "172.20.0.0/24"
+          args: >-
+            -p "80:80@agent[0]"
+            -p "443:443@agent[0]"
+            -p "5053:53/udp@agent[0]"
+            --agents 3
+            --no-lb
+            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+
+      - uses: ./
+        id: test-cluster-2
+        name: "Create 1nd k3d Cluster in 172.20.1.0/24"
+        with:
+          cluster-name: "test-cluster-2"
+          network: "nw02"
+          subnet-CIDR: "172.20.1.0/24"
+          args: >-
+            -p "81:80@agent[0]"
+            -p "444:443@agent[0]"
+            -p "5054:53/udp@agent[0]"
+            --agents 3
+            --no-lb
+            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+
+      - name: Cluster info
+        run: |
+          echo test-cluster-1: ${{ steps.test-cluster-1.outputs.network }} ${{ steps.test-cluster-1.outputs.subnet-CIDR }}
+          echo test-cluster-2: ${{ steps.test-cluster-2.outputs.network }} ${{ steps.test-cluster-2.outputs.subnet-CIDR }}
+          echo
+          kubectl cluster-info --context k3d-test-cluster-1 && kubectl cluster-info --context k3d-test-cluster-2
+      - name: Nodes
+        # hack, wait until all agents are ready.
+        run: |
+          docker ps -a
+          sleep 5
+          kubectl config use-context k3d-test-cluster-1
+          kubectl get nodes -o wide
+          kubectl config use-context k3d-test-cluster-2
+          kubectl get nodes -o wide
+      - name: Network
+        run: |
+          docker network inspect nw01
+          docker network inspect nw02
