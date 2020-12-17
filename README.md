@@ -23,7 +23,7 @@ functionality**. For instance, the E2E use-case is [operator](https://kubernetes
 
 ## Getting started
 AbsaOSS/k3d-action runs [k3d](https://k3d.io/) which is a lightweight wrapper to run [k3s](https://k3s.io/) 
-(Rancher Lab’s minimal Kubernetes distribution) in a docker. Thanks to that, we could spin up the test environment 
+(Rancher Lab’s minimal Kubernetes distribution) in containers. Thanks to that, we could spin up the test environment 
 quickly with minimal memory requirements, which is especially important in multi-cluster environments.
 
 AbsaOSS/k3d-action defines several input attributes and two outputs:
