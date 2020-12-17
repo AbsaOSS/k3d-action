@@ -1,5 +1,5 @@
 # AbsaOSS/k3d-action
-Easy to use GitHub action allows you to test single/multi-cluster apps with additional private registry support.
+A GitHub Action to run lightweight ephemeral Kubernetes clusters during workflow.
 
 - [Introduction](#introduction)
 - [Getting started](#getting-started)
@@ -66,7 +66,9 @@ configuration looks like this :
           cluster-name: "test-cluster-1"
           args: --agents 1
 ```
-k3d creates a cluster with one worker node (having traefik and metrics services), one agent and one default load-balancer node. In real scenarios you might prefer to do some port mapping and disable default load balancer. Such an action would look like this:
+k3d creates a cluster with one worker node (with [traefik](https://traefik.io/) and metrics services), one agent and one 
+default load-balancer node. In real scenarios you might prefer to do some port mapping and disable default load balancer. 
+Such an action would look like this:
 ```yaml
       - uses: AbsaOSS/k3d-action@v1.0.0
         name: "Create Single Cluster"
