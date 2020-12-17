@@ -15,7 +15,7 @@ Easy to use GitHub action allows you to test single/multi-cluster apps with addi
 
 ## Introduction
 
-Applications running on kubernetes clusters (microservices, controllers,...) come with their own set of complexities and concerns. 
+Applications running on Kubernetes clusters (microservices, controllers,...) come with their own set of complexities and concerns. 
 In particular, E2E testing k8s based applications requires new approaches to confirm proper operation and continued 
 availability under heavy load or in the face of resource failure. **AbsaOSS/k3d-action allows to test the** _overall_ **application 
 functionality**. For instance, the E2E use-case is [operator](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) testing
