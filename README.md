@@ -66,8 +66,7 @@ configuration looks like this :
           cluster-name: "test-cluster-1"
           args: --agents 1
 ```
-k3d creates a cluster with one server node (having traefik and metrics services), one agent and one default load-balancer node. In the real scenarios you 
-prefer to do some port-mapping and disable default load-balancer. Such action looks like this:
+k3d creates a cluster with one worker node (having traefik and metrics services), one agent and one default load-balancer node. In real scenarios you might prefer to do some port mapping and disable default load balancer. Such an action would look like this:
 ```yaml
       - uses: AbsaOSS/k3d-action@v1.0.0
         name: "Create Single Cluster"
