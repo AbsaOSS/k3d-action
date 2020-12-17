@@ -9,6 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
+        id: test-cluster-1
         name: "Create 1st k3d Cluster in 172.20.0.0/24"
         with:
           cluster-name: "test-cluster-1"
@@ -23,6 +24,7 @@ jobs:
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
       - uses: ./
+        id: test-cluster-2
         name: "Create 1nd k3d Cluster in 172.20.1.0/24"
         with:
           cluster-name: "test-cluster-2"
