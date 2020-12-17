@@ -223,7 +223,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
 ## Private Registry
 
 Before test starts, you need to build your app and install into the cluster. This requires interaction 
-with the docker registry. Usually you don't want to push a new image into the remote registry for each test. 
+with the image registry. Usually you don't want to push a new image into the remote registry for each test. 
 AbsaOSS/k3d-action provides private image registry called `registry.localhost`. Registry is by default listening 
 on port `5000` with no authentication and TLS. For more details, 
 see https://rancher.com/docs/k3s/latest/en/installation/private-registry/.
@@ -257,7 +257,7 @@ The similar as previous example but injecting default registry into multiple clu
 is shared across clusters, so you don't have to push the same image several times. 
 ```yaml
       - uses: AbsaOSS/k3d-action@v1.0.0
-        name: "Create 1st k3d Cluster in 172.20.0.0/24 with Registry"
+        name: "Create 1st Cluster in 172.20.0.0/24 with Registry"
         with:
           cluster-name: "test-cluster-1-a"
           network: "nw01"
@@ -268,7 +268,7 @@ is shared across clusters, so you don't have to push the same image several time
             --no-lb
 
       - uses: AbsaOSS/k3d-action@v1.0.0
-        name: "Create 2nd k3d Cluster in 172.20.0.0/24 with Registry"
+        name: "Create 2nd Cluster in 172.20.0.0/24 with Registry"
         with:
           cluster-name: "test-cluster-2-a"
           network: "nw01"
@@ -278,7 +278,7 @@ is shared across clusters, so you don't have to push the same image several time
             --no-lb
 
       - uses: AbsaOSS/k3d-action@v1.0.0
-        name: "Create 1st k3d Cluster in 172.20.1.0/24 with Registry"
+        name: "Create 1st Cluster in 172.20.1.0/24 with Registry"
         with:
           cluster-name: "test-cluster-1-b"
           network: "nw02"
@@ -289,7 +289,7 @@ is shared across clusters, so you don't have to push the same image several time
             --no-lb
 
       - uses: AbsaOSS/k3d-action@v1.0.0
-        name: "Create 2nd k3d Cluster in 172.20.1.0/24 with Registry"
+        name: "Create 2nd Cluster in 172.20.1.0/24 with Registry"
         with:
           cluster-name: "test-cluster-2-b"
           network: "nw02"
