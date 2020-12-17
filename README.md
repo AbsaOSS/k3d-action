@@ -174,7 +174,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
 ### Two pairs of clusters on two isolated networks
 ```yaml
       - uses: AbsaOSS/k3d-action@v1.0.0
-        name: "Create 1st k3d Cluster in 172.20.0.0/24"
+        name: "Create 1st Cluster in 172.20.0.0/24"
         with:
           cluster-name: "test-cluster-1-a"
           network: "nw01"
