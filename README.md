@@ -1,5 +1,7 @@
 # AbsaOSS/k3d-action
 A GitHub Action to run lightweight ephemeral Kubernetes clusters during workflow.
+Fundamental advantage of this action is a full customization of embedded k3s clusters. In addition, it provides 
+a private image registry and multi-cluster support.
 
 - [Introduction](#introduction)
 - [Getting started](#getting-started)
