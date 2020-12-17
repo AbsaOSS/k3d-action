@@ -1,5 +1,5 @@
-name: Setup K3d
-description: Easy to use GitHub action allows you to test single/multi-cluster apps with additional private registry support.
+name: AbsaOSS/k3d-action
+description: A GitHub Action to run lightweight ephemeral Kubernetes clusters during workflow
 author: AbsaOSS
 # see: https://haya14busa.github.io/github-action-brandings/
 branding:
