@@ -81,7 +81,7 @@ prefer to do some port-mapping and disable default load-balancer. Such action lo
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 ```
-The created cluster exposes two TCP (:8083,:8443) and one UDP (:5053) ports. The cluster comprises one server, three 
+The created cluster exposes two TCP (`:8083`,`:8443`) and one UDP (`:5053`) ports. The cluster comprises one server, three 
 agents and no load balancers. [k3s-server-argument](https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/#k3s-server-cli-help) 
 disable default traefik and metrics.
 
