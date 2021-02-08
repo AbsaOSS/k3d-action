@@ -22,8 +22,8 @@ inputs:
     description: "(Optional) Autogenerate docker registry accessible from the cluster."
     required: false
     default: "false"
-  override-registry-config-path:
-    description: "(Optional) Path to custom registry configuration file. Variable requires USE_DEFAULT_REGISTRY to be true."
+  registry-port:
+    description: "(Optional) Registry port. Default value 5000."
     required: false
 outputs:
   network:
@@ -44,4 +44,4 @@ runs:
         NETWORK: ${{ inputs.network }}
         SUBNET_CIDR: ${{ inputs.subnet-CIDR }}
         USE_DEFAULT_REGISTRY: ${{ inputs.use-default-registry }}
-        OVERRIDE_REGISTRY_CONFIG_PATH: ${{ inputs.override-registry-config-path }}
+        REGISTRY_PORT: ${{ inputs.registry-port }}

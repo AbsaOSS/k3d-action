@@ -11,3 +11,6 @@
 
 # ...even if they are in subdirectories
 !*/
+
+# except gitignore
+/**/.gitignore

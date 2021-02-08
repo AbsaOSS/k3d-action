@@ -14,6 +14,7 @@ jobs:
         with:
           cluster-name: "test-cluster-1"
           use-default-registry: true
+          registry-port: 5001
           args: >-
             --agents 1
             --no-lb
@@ -32,4 +33,8 @@ jobs:
           kubectl get nodes -o wide
       - name: Network
         run: docker network inspect k3d-action-bridge-network
+      - name: Test registry
+        env:
+          REGISTRY_PORT: 5001
+        run: ./run.sh test-registry
 
