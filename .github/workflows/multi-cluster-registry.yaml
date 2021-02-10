@@ -46,3 +46,5 @@ jobs:
           kubectl get nodes -o wide
       - name: Network
         run: docker network inspect k3d-action-bridge-network
+      - name: Test registry
+        run: ./run.sh test-registry

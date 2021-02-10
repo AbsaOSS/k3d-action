@@ -1,10 +1,10 @@
-name: Multi cluster; two pairs of clusters on two isolated networks with registry
+name: Multi cluster; two pairs of clusters on two isolated networks with shared registry
 
 on:
   [workflow_dispatch, push]
 jobs:
   k3d-multicluster-demo:
-    name: Two pairs of clusters on two isolated networks with registry
+    name: Two pairs of clusters on two isolated networks with shared registry
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -16,7 +16,6 @@ jobs:
           network: "nw01"
           subnet-CIDR: "172.20.0.0/24"
           use-default-registry: true
-          registry-port: 5001
           args: >-
             --agents 1
             --no-lb
@@ -28,8 +27,6 @@ jobs:
         with:
           cluster-name: "test-cluster-2-a"
           network: "nw01"
-          use-default-registry: true
-          registry-port: 5001
           args: >-
             --agents 1
             --no-lb
@@ -42,8 +39,6 @@ jobs:
           cluster-name: "test-cluster-1-b"
           network: "nw02"
           subnet-CIDR: "172.20.1.0/24"
-          use-default-registry: true
-          registry-port: 5002
           args: >-
             --agents 1
             --no-lb
@@ -55,8 +50,6 @@ jobs:
         with:
           cluster-name: "test-cluster-2-b"
           network: "nw02"
-          use-default-registry: true
-          registry-port: 5002
           args: >-
             --agents 1
             --no-lb
@@ -97,10 +90,5 @@ jobs:
 
       - name: Test registry nw01
         env:
-          REGISTRY_PORT: 5001
-        run: ./run.sh test-registry
-
-      - name: Test registry nw02
-        env:
-          REGISTRY_PORT: 5002
+          REGISTRY_PORT: 5000
         run: ./run.sh test-registry

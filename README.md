@@ -59,12 +59,13 @@ Output attributes are accessible via `id`, e.g.:
 For more details see: [Multi Cluster on isolated networks](#multi-cluster-on-isolated-networks)
 
 ### Version mapping
-K3d doesn't guarantee backward compatibility. To avoid potential issues due to usage the latest versions, the k3d, k3s 
-versions are hard-coded.
+Implementation of additional features brings complexity and sometimes may happen that extra feature is broken in special cases. 
+To prevent potential issues due to usage such versions, the k3d, k3s versions are hard-coded.
 
 | k3d-action |   k3d   |           k3s           |
 |:----------:|:-------:|:-----------------------:|
 | v1.1.0     |  [v3.4.0](https://github.com/rancher/k3d/releases/tag/v3.4.0) | [rancher/k3s:v1.20.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.2%2Bk3s1)|
+| v1.2.0     |  [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) | [rancher/k3s:v1.20.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.2%2Bk3s1)|
 
 
 ## Single Cluster
@@ -237,13 +238,13 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
 
 Before test starts, you need to build your app and install into the cluster. This requires interaction 
 with the image registry. Usually you don't want to push a new image into the remote registry for each test. 
-AbsaOSS/k3d-action provides private image registry called `registry.localhost`. Registry is by default listening 
-on port `5000` with no authentication and TLS. For more details, 
-see https://rancher.com/docs/k3s/latest/en/installation/private-registry/.
+AbsaOSS/k3d-action provides private image registry `registry:2`. Registry is by default listening 
+on port `5000` with no authentication and TLS. 
+
 Example below demonstrates how to interact with default docker registry: 
 ```Makefile
-	docker build . -t registry.localhost:5000/test:v0.0.1
-	docker push registry.localhost:5000/test:v0.0.1
+	docker build . -t localhost:5000/test:v0.0.1
+	docker push localhost:5000/test:v0.0.1
 ```
 
 ### Single Cluster With Private Registry
@@ -259,10 +260,10 @@ Example below demonstrates how to interact with default docker registry:
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 ```
-`use-default-registry: true` is only stuff you need to do. AbsaOSS/k3d-action injects default registry 
-configuration into the cluster.
+`use-default-registry: true` is only setting you should be using. AbsaOSS/k3d-action injects default registry 
+into the cluster. If the default port `5000` is already occupied, you can change it by setting optional attribute `registry-port`.
 
-For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Single+cluster+on+default+network+with+registry%22), 
+For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Single+cluster+on+default+network+with+shared+registry%22), 
 [Source](./.github/workflows/single-cluster-registry.yaml)
 
 ### Multi Cluster With Private Registry
@@ -276,6 +277,7 @@ is shared across clusters, so you don't have to push the same image several time
           network: "nw01"
           subnet-CIDR: "172.20.0.0/24"
           use-default-registry: true
+          registry-port: 5001
           args: >-
             --agents 1
             --no-lb
@@ -296,7 +298,6 @@ is shared across clusters, so you don't have to push the same image several time
           cluster-name: "test-cluster-1-b"
           network: "nw02"
           subnet-CIDR: "172.20.1.0/24"
-          use-default-registry: true
           args: >-
             --agents 1
             --no-lb
@@ -306,27 +307,12 @@ is shared across clusters, so you don't have to push the same image several time
         with:
           cluster-name: "test-cluster-2-b"
           network: "nw02"
-          use-default-registry: true
           args: >-
             --agents 1
             --no-lb
 ```
-For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks+with+registry%22), 
-[Source](./.github/workflows/multi-cluster-two-piars-registry.yaml)
-
-### Using Custom Private Registry
-In some very special cases is default registry, not enough for you. From some reason you need to test against secured 
-registry or must change hard-coded port `5000`.  For that reason `override-registry-config-path` attribute exists.
-```yaml
-      - uses: AbsaOSS/k3d-action@v1.1.0
-        id: single-cluster
-        name: "Create single Cluster with Registry"
-        with:
-          cluster-name: "test-cluster-1"
-          use-default-registry: true
-          override-registry-config-path: deployment/registries.yaml
-          args: >-
-            --agents 1
-```
-The code above will inject [configuration file](https://rancher.com/docs/k3s/latest/en/installation/private-registry/#mirrors) 
-`registries.yaml` from the relative path to your project root.
+For more details see: 
+ - shared registry [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks+with+shared+registry%22), 
+[Source](./.github/workflows/multi-cluster-two-piars-registry-shared.yaml)
+- isolated registries (each network has own registry) [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks+with+registry%22),
+  [Source](./.github/workflows/multi-cluster-two-piars-registry.yaml)
