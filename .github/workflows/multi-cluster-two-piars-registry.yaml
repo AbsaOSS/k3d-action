@@ -43,7 +43,7 @@ jobs:
           network: "nw02"
           subnet-CIDR: "172.20.1.0/24"
           use-default-registry: true
-          registry-port: 5002
+          registry-port: 5001
           args: >-
             --agents 1
             --no-lb
@@ -56,7 +56,7 @@ jobs:
           cluster-name: "test-cluster-2-b"
           network: "nw02"
           use-default-registry: true
-          registry-port: 5002
+          registry-port: 5001
           args: >-
             --agents 1
             --no-lb
@@ -100,7 +100,3 @@ jobs:
           REGISTRY_PORT: 5001
         run: ./run.sh test-registry
 
-      - name: Test registry nw02
-        env:
-          REGISTRY_PORT: 5002
-        run: ./run.sh test-registry

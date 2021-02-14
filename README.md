@@ -13,7 +13,6 @@ a private image registry and multi-cluster support.
 - [Private Registry](#private-registry)
     - [Single Cluster](#single-cluster-with-private-registry)
     - [Multi Cluster](#multi-cluster-with-private-registry)
-    - [Custom Private Registry](#using-custom-private-registry)
 
 ## Introduction
 
@@ -100,6 +99,55 @@ disable default traefik and metrics.
 
 For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Single+cluster+on+default+network%22), 
 [Source](./.github/workflows/single-cluster.yaml)
+
+### Config file support
+From v1.2.0 you can configure action via config files or mix arguments together with config files. This setup is useful when 
+you want to share the configuration for local testing and testing within k3d-action. 
+```yaml
+      - uses: ./
+        id: single-cluster
+        name: "Create single k3d Cluster"
+        with:
+          cluster-name: "test-cluster-1"
+          args: >-
+            --agents 1
+            --config=<path to config yaml>
+```
+All you need to do is to place configuration file somewhere into your project. However, keep in mind, that command line
+arguments will always take precedence over configuration, so the previous example will result in only one agent, not three as 
+configured.
+```yaml
+apiVersion: k3d.io/v1alpha2
+kind: Simple
+servers: 1
+agents: 3 # The action will overwrite this by 1
+ports:
+  - port: 0.0.0.0:80:80
+    nodeFilters:
+      - agent[0]
+  - port: 0.0.0.0:443:443
+    nodeFilters:
+      - agent[0]
+  - port: 0.0.0.0:5053:53/udp
+    nodeFilters:
+      - agent[0]
+options:
+  k3d:
+    wait: true
+    timeout: "60s"
+    disableLoadbalancer: true
+    disableImageVolume: true
+  k3s:
+    extraServerArgs:
+      - --no-deploy=traefik,servicelb,metrics-server
+    extraAgentArgs: []
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
+```
+For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Single+cluster+on+default+network+with+config%22),
+  [Source action](./.github/workflows/single-cluster-config.yaml), [Source config](./.github/workflows/assets/1.yaml)
+
 ## Multi Cluster
 AbsaOSS/k3d-action primarily creates clusters in the default bridge-network called  `k3d-action-bridge-network` with 
 subnet CIDR `172.16.0.0/24`. To create clusters in the new isolated networks, you must set `network` and `subnet-CIDR` 
@@ -134,9 +182,12 @@ manually.
 Both clusters comprise one server node and three agents nodes. Because of port collision, each cluster must expose 
 different ports.
 
-For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+clusters+on+default+network%22), 
+For more details see: 
+ - multi-cluster [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+clusters+on+default+network%22), 
 [Source](./.github/workflows/multi-cluster.yaml)
-
+ - multi-cluster with config [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+clusters+on+default+network+with+config%22),
+   [Source action](./.github/workflows/multi-cluster-config.yaml), [Source config1](./.github/workflows/assets/1.yaml), [Source config2](./.github/workflows/assets/2.yaml)
+   
 ### Multi Cluster on isolated networks
 ```yaml
       - uses: AbsaOSS/k3d-action@v1.1.0
@@ -234,17 +285,19 @@ As you can see, `test-cluster-2-a` doesn't specify subnet-CIDR, because it inher
 
 For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks%22), 
 [Source](./.github/workflows/multi-cluster-two-piars.yaml)
+
 ## Private Registry
 
 Before test starts, you need to build your app and install into the cluster. This requires interaction 
 with the image registry. Usually you don't want to push a new image into the remote registry for each test. 
-AbsaOSS/k3d-action provides private image registry `registry:2`. Registry is by default listening 
+AbsaOSS/k3d-action provides private image registry called `registry.localhost`. Registry is by default listening 
 on port `5000` with no authentication and TLS. 
 
 Example below demonstrates how to interact with default docker registry: 
 ```Makefile
-	docker build . -t localhost:5000/test:v0.0.1
-	docker push localhost:5000/test:v0.0.1
+	# push from inside the cluster 
+	docker build . -t registry.localhost:5000/test:v0.0.1
+	docker push registry.localhost:5000/test:v0.0.1
 ```
 
 ### Single Cluster With Private Registry
@@ -314,5 +367,5 @@ is shared across clusters, so you don't have to push the same image several time
 For more details see: 
  - shared registry [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks+with+shared+registry%22), 
 [Source](./.github/workflows/multi-cluster-two-piars-registry-shared.yaml)
-- isolated registries (each network has own registry) [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks+with+registry%22),
-  [Source](./.github/workflows/multi-cluster-two-piars-registry.yaml)
+- isolated registries (each network has own registry) with config [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks+with+registry+from+config+files%22),
+  [Source](./.github/workflows/multi-cluster-two-piars-registry-config.yaml), [Source configs](./.github/workflows/assets)

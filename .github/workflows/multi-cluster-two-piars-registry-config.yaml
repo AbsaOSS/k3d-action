@@ -1,10 +1,10 @@
-name: Multi cluster; two pairs of clusters on two isolated networks with shared registry
+name: Multi cluster; two pairs of clusters on two isolated networks with registry from config files
 
 on:
   [workflow_dispatch, push]
 jobs:
   k3d-multicluster-demo:
-    name: Two pairs of clusters on two isolated networks with shared registry
+    name: Two pairs of clusters on two isolated networks with registry from config files
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -16,10 +16,10 @@ jobs:
           network: "nw01"
           subnet-CIDR: "172.20.0.0/24"
           use-default-registry: true
+          registry-port: 5001
           args: >-
             --agents 1
-            --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --config=.github/workflows/assets/1.yaml
 
       - uses: ./
         id: test-cluster-1-b
@@ -27,10 +27,11 @@ jobs:
         with:
           cluster-name: "test-cluster-2-a"
           network: "nw01"
+          use-default-registry: true
+          registry-port: 5001
           args: >-
             --agents 1
-            --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --config=.github/workflows/assets/2.yaml
 
       - uses: ./
         id: test-cluster-2-a
@@ -39,10 +40,11 @@ jobs:
           cluster-name: "test-cluster-1-b"
           network: "nw02"
           subnet-CIDR: "172.20.1.0/24"
+          use-default-registry: true
+          registry-port: 5001
           args: >-
             --agents 1
-            --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --config=.github/workflows/assets/3.yaml
 
       - uses: ./
         id: test-cluster-2-b
@@ -50,10 +52,11 @@ jobs:
         with:
           cluster-name: "test-cluster-2-b"
           network: "nw02"
+          use-default-registry: true
+          registry-port: 5001
           args: >-
             --agents 1
-            --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --config=.github/workflows/assets/4.yaml
 
       - name: Cluster info
         run: |
@@ -88,7 +91,8 @@ jobs:
           docker network inspect nw01
           docker network inspect nw02
 
-      - name: Test registry
+      - name: Test registry nw01
         env:
-          REGISTRY_PORT: 5000
+          REGISTRY_PORT: 5001
         run: ./run.sh test-registry
+
