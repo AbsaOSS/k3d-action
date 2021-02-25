@@ -42,9 +42,9 @@ AbsaOSS/k3d-action defines several input attributes and two outputs:
  - `subnet-CIDR` (Optional) Cluster subnet CIDR. Provide new CIDR only if `network` is defined first time.
  
  - `use-default-registry` (Optional) If `true`, injects private image registry `registry.localhost:5000` into action.
- 
- - `override-registry-config-path` (Optional) Defines a path to custom registry configuration, in case the default 
- registry is not sufficient. Requires `use-default-registry` to be set to `true`. 
+
+- `registry-port` (Optional) If the default registry is injected into cluster, the port is `5000`.
+  You can change it by setting `registry-port`.
 
 ### Outputs
  
