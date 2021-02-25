@@ -117,6 +117,7 @@ deploy(){
 
     echo -e "\existing_network${YELLOW}Deploy cluster ${CYAN}$name ${NC}"
     eval "k3d cluster create $name --wait $arguments --image ${K3S_VERSION} --network $network $registryArg"
+    wait_for_nodes
 }
 
 # see: https://rancher.com/docs/k3s/latest/en/installation/private-registry/#mirrors
@@ -172,6 +173,31 @@ init_registry(){
     fi
 }
 
+# waits until all nodes are ready
+wait_for_nodes(){
+  echo -e "${YELLOW}wait until all agents are ready${NC}"
+  while :
+  do
+    readyNodes=1
+    statusList=$(kubectl get nodes --no-headers | awk '{ print $2}')
+    # shellcheck disable=SC2162
+    while read status
+    do
+      if [[ "$status" == "NotReady" ]]
+      then
+        readyNodes=0
+        break
+      fi
+    done <<< "$(echo -e  "$statusList")"
+
+    # all nodes are ready; exit
+    if [[ $readyNodes == 1 ]]
+    then
+      break
+    fi
+    sleep 1
+  done
+}
 #######################
 #
 #     GUARDS SECTION

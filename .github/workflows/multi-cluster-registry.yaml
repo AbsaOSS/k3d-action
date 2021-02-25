@@ -36,10 +36,8 @@ jobs:
           echo
           kubectl cluster-info --context k3d-test-cluster-1 && kubectl cluster-info --context k3d-test-cluster-2
       - name: Nodes
-        # hack, wait until all agents are ready.
         run: |
           docker ps -a
-          sleep 5
           kubectl config use-context k3d-test-cluster-1
           kubectl get nodes -o wide
           kubectl config use-context k3d-test-cluster-2

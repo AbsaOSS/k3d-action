@@ -25,10 +25,8 @@ jobs:
           echo
           kubectl cluster-info --context k3d-test-cluster-1
       - name: Nodes
-        # hack, wait until agents are ready...
         run: |
           docker ps -a
-          sleep 10
           kubectl config use-context k3d-test-cluster-1
           kubectl get nodes -o wide
       - name: Network
