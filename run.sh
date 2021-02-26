@@ -183,13 +183,12 @@ wait_for_nodes(){
     # shellcheck disable=SC2162
     while read status
     do
-      if [[ "$status" == "NotReady" ]]
+      if [ "$status" == "NotReady" ] || [ "$status" == "" ]
       then
         readyNodes=0
         break
       fi
     done <<< "$(echo -e  "$statusList")"
-
     # all nodes are ready; exit
     if [[ $readyNodes == 1 ]]
     then
