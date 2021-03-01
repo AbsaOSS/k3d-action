@@ -1,0 +1,18 @@
+name: Retrieving nodes right after we create cluster
+
+on:
+  [workflow_dispatch, push]
+jobs:
+  k3d-node-list-demo:
+    name: Retrieving nodes right after we create cluster
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        name: node-list
+        with:
+          cluster-name: "node-list"
+          args: >-
+            --no-lb
+            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+      - run: kubectl get nodes
