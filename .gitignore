@@ -7,6 +7,7 @@
 !README.md
 !.gitignore
 !.licignore
+!Makefile
 !run.sh
 !*.yaml
 
