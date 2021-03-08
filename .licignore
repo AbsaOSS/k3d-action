@@ -2,16 +2,8 @@
 *
 
 # But not these files...
-!CODEOWNERS
-!LICENSE
-!README.md
-!.gitignore
-!.licignore
 !run.sh
-!*.yaml
+# !*.yaml
 
 # ...even if they are in subdirectories
 !*/
-
-# except gitignore
-/**/.gitignore
