@@ -1,0 +1,38 @@
+name: Single cluster on default network with imported registry
+
+on:
+  [workflow_dispatch, push]
+jobs:
+  k3d-single-cluster-demo:
+    name: Single cluster on default network with imported registry
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        id: single-cluster
+        name: "Create single k3d Cluster with imported Registry"
+        with:
+          cluster-name: test-cluster-1
+          args: >-
+            --agents 3
+            --no-lb
+            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+      - name: "Docker repo demo"
+        run: |
+          docker build .github/workflows/assets/. -t myproj/demo:v1.0.0
+          k3d image import myproj/demo:v1.0.0 -c test-cluster-1 --verbose
+          kubectl apply -f .github/workflows/assets/pod.yaml
+      - name: Cluster info
+        run: |
+          echo ${{ steps.single-cluster.outputs.network }} ${{ steps.single-cluster.outputs.subnet-CIDR }}
+          echo
+          kubectl cluster-info --context k3d-test-cluster-1
+      - name: Nodes
+        run: |
+          docker ps -a
+          kubectl config use-context k3d-test-cluster-1
+          kubectl get nodes -o wide
+      - name: Network
+        run: docker network inspect k3d-action-bridge-network
+
+

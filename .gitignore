@@ -10,6 +10,7 @@
 !Makefile
 !run.sh
 !*.yaml
+!Dockerfile
 
 # ...even if they are in subdirectories
 !*/
