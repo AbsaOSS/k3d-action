@@ -72,7 +72,7 @@ To prevent potential issues due to usage such versions, the k3d, k3s versions ar
 Although AbsaOSS/k3d-action strongly supports multi-cluster. Single cluster scenarios are very popular. The minimum single-cluster 
 configuration looks like this :
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create Single Cluster"
         with:
           cluster-name: "test-cluster-1"
@@ -82,7 +82,7 @@ k3d creates a cluster with one worker node (with [traefik](https://traefik.io/) 
 default load-balancer node. In real scenarios you might prefer to do some port mapping and disable default load balancer. 
 Such an action would look like this:
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create Single Cluster"
         with:
           cluster-name: "test-cluster-1"
@@ -157,7 +157,7 @@ manually.
 ### Multi Cluster on default network
 ```yaml
       - uses: actions/checkout@v2
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create 1st Cluster"
         with:
           cluster-name: "test-cluster-1"
@@ -168,7 +168,7 @@ manually.
             --agents 3
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create 2nd Cluster"
         with:
           cluster-name: "test-cluster-2"
@@ -191,7 +191,7 @@ For more details see:
    
 ### Multi Cluster on isolated networks
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create 1st Cluster in 172.20.0.0/24"
         id: test-cluster-1
         with:
@@ -206,7 +206,7 @@ For more details see:
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create 2nd Cluster in 172.20.1.0/24"
         id: test-cluster-2
         with:
@@ -239,7 +239,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
 [Source](./.github/workflows/multi-cluster-on-isolated-networks.yaml)
 ### Two pairs of clusters on two isolated networks
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create 1st Cluster in 172.20.0.0/24"
         with:
           cluster-name: "test-cluster-1-a"
@@ -250,7 +250,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create 2nd Cluster in 172.20.0.0/24"
         with:
           cluster-name: "test-cluster-2-a"
@@ -260,7 +260,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create 1st Cluster in 172.20.1.0/24"
         with:
           cluster-name: "test-cluster-1-b"
@@ -271,7 +271,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
-      - uses: AbsaOSS/k3d-action@v1.1.0
+      - uses: AbsaOSS/k3d-action@v1.3.1
         name: "Create 2nd Cluster in 172.20.1.0/24"
         with:
           cluster-name: "test-cluster-2-b"
@@ -290,83 +290,43 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
 ## Private Registry
 
 Before test starts, you need to build your app and install into the cluster. This requires interaction 
-with the image registry. Usually you don't want to push a new image into the remote registry for each test. 
-AbsaOSS/k3d-action provides private image registry called `registry.localhost`. Registry is by default listening 
-on port `5000` with no authentication and TLS. 
-
-Example below demonstrates how to interact with default docker registry: 
-```Makefile
-	# push from inside the cluster 
-	docker build . -t registry.localhost:5000/test:v0.0.1
-	docker push registry.localhost:5000/test:v0.0.1
+with the image registry. Usually you don't want to push a new image into the remote registry for each test.
+Instead, you can import the image directly into the created cluster:
+```shell
+docker build . -t <repository>:<semver>
+k3d image import <repository>:<semver> -c <cluster-name>
 ```
-
-### Single Cluster With Private Registry
+Example below demonstrates how to interact with imported docker registry:
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.1.0
+    steps:
+      - uses: actions/checkout@v2
+      - uses: AbsaOSS/k3d-action@v1.3.1
         id: single-cluster
-        name: "Create single Cluster with Registry"
+        name: "Create single k3d Cluster with imported Registry"
         with:
-          cluster-name: "test-cluster-1"
-          use-default-registry: true
+          cluster-name: test-cluster-1
           args: >-
-            --agents 1
+            --agents 3
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+      - name: "Docker repo demo"
+        run: |
+          docker build . -t myproj/demo:v1.0.0
+          k3d image import myproj/demo:v1.0.0 -c test-cluster-1 --verbose
+          kubectl apply -f pod.yaml
+
+# pod.yaml
+#
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: test-pod
+# spec:
+#   containers:
+#   - name: demo-app
+#     image: myproj/demo:v1.0.0
 ```
-`use-default-registry: true` is only setting you should be using. AbsaOSS/k3d-action injects default registry 
-into the cluster. If the default port `5000` is already occupied, you can change it by setting optional attribute `registry-port`.
 
-For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Single+cluster+on+default+network+with+shared+registry%22), 
-[Source](./.github/workflows/single-cluster-registry.yaml)
-
-### Multi Cluster With Private Registry
-The similar as previous example but injecting default registry into multiple clusters. It should be noted that the registry 
-is shared across clusters, so you don't have to push the same image several times. 
-```yaml
-      - uses: AbsaOSS/k3d-action@v1.1.0
-        name: "Create 1st Cluster in 172.20.0.0/24 with Registry"
-        with:
-          cluster-name: "test-cluster-1-a"
-          network: "nw01"
-          subnet-CIDR: "172.20.0.0/24"
-          use-default-registry: true
-          registry-port: 5001
-          args: >-
-            --agents 1
-            --no-lb
-
-      - uses: AbsaOSS/k3d-action@v1.1.0
-        name: "Create 2nd Cluster in 172.20.0.0/24 with Registry"
-        with:
-          cluster-name: "test-cluster-2-a"
-          network: "nw01"
-          use-default-registry: true
-          args: >-
-            --agents 1
-            --no-lb
-
-      - uses: AbsaOSS/k3d-action@v1.1.0
-        name: "Create 1st Cluster in 172.20.1.0/24 with Registry"
-        with:
-          cluster-name: "test-cluster-1-b"
-          network: "nw02"
-          subnet-CIDR: "172.20.1.0/24"
-          args: >-
-            --agents 1
-            --no-lb
-
-      - uses: AbsaOSS/k3d-action@v1.1.0
-        name: "Create 2nd Cluster in 172.20.1.0/24 with Registry"
-        with:
-          cluster-name: "test-cluster-2-b"
-          network: "nw02"
-          args: >-
-            --agents 1
-            --no-lb
-```
-For more details see: 
- - shared registry [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks+with+shared+registry%22), 
-[Source](./.github/workflows/multi-cluster-two-piars-registry-shared.yaml)
-- isolated registries (each network has own registry) with config [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks+with+registry+from+config+files%22),
-  [Source](./.github/workflows/multi-cluster-two-piars-registry-config.yaml), [Source configs](./.github/workflows/assets)
+For further details see: 
+ - shared registry [Demo](https://github.com/AbsaOSS/k3d-action/actions/workflows/single-cluster-import-registry.yaml), 
+[Source](./.github/workflows/single-cluster-import-registry.yaml)
