@@ -1,5 +1,6 @@
 apiVersion: k3d.io/v1alpha2
 kind: Simple
+# image: default k3s version
 servers: 1
 agents: 3
 ports:

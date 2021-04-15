@@ -25,8 +25,7 @@ CYAN=
 RED=
 NC=
 K3D_URL=https://raw.githubusercontent.com/rancher/k3d/main/install.sh
-K3D_VERSION=v4.2.0
-K3S_VERSION=docker.io/rancher/k3s:v1.20.4-k3s1
+K3D_VERSION=v4.4.1
 DEFAULT_NETWORK=k3d-action-bridge-network
 DEFAULT_SUBNET=172.16.0.0/24
 NOT_FOUND=k3d-not-found-network
@@ -131,7 +130,7 @@ deploy(){
     curl --silent --fail ${K3D_URL} | TAG=${K3D_VERSION} bash
 
     echo -e "\existing_network${YELLOW}Deploy cluster ${CYAN}$name ${NC}"
-    eval "k3d cluster create $name --wait $arguments --image ${K3S_VERSION} --network $network $registryArg"
+    eval "k3d cluster create $name --wait $arguments --network $network $registryArg"
     wait_for_nodes
 }
 

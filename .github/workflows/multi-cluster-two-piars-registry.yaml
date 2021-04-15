@@ -20,6 +20,7 @@ jobs:
           args: >-
             --agents 1
             --no-lb
+            --image docker.io/rancher/k3s:v1.20.4-k3s1
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
       - uses: ./
@@ -33,6 +34,7 @@ jobs:
           args: >-
             --agents 1
             --no-lb
+            --image docker.io/rancher/k3s:v1.20.4-k3s1
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
       - uses: ./
@@ -47,6 +49,7 @@ jobs:
           args: >-
             --agents 1
             --no-lb
+            --image docker.io/rancher/k3s:v1.20.4-k3s1
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
       - uses: ./
@@ -60,6 +63,7 @@ jobs:
           args: >-
             --agents 1
             --no-lb
+            --image docker.io/rancher/k3s:v1.20.4-k3s1
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
       - name: Cluster info
