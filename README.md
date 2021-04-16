@@ -59,20 +59,27 @@ For more details see: [Multi Cluster on isolated networks](#multi-cluster-on-iso
 
 ### Version mapping
 Implementation of additional features brings complexity and sometimes may happen that extra feature is broken in special cases. 
-To prevent potential issues due to usage such versions, the k3d, k3s versions are hard-coded.
+To prevent potential issues due to usage such versions, the k3d version is predefined.
 
 | k3d-action |   k3d   |           k3s           |
 |:----------:|:-------:|:-----------------------:|
 | v1.1.0     |  [v3.4.0](https://github.com/rancher/k3d/releases/tag/v3.4.0) | [rancher/k3s:v1.20.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.2%2Bk3s1)|
 | v1.2.0     |  [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) | [rancher/k3s:v1.20.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.2%2Bk3s1)|
 | v1.3.0     |  [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) | [rancher/k3s:v1.20.4-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.4%2Bk3s1)|
+| v1.4.0     |  [v4.4.1](https://github.com/rancher/k3d/releases/tag/v4.4.1) | specified by k3d or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
 
+From `v1.4.0` would k3d-action users set k3s version explicitly via [configuration](#config-file-support) or 
+argument e.g.`--image docker.io/rancher/k3s:v1.20.4-k3s1` otherwise k3d specifies which version will be used. 
+
+For further k3s details see: 
+ - docker [rancher/k3s](https://hub.docker.com/r/rancher/k3s/tags?page=2&ordering=last_updated)
+ - github [k3s/releases](https://github.com/k3s-io/k3s/releases)
 
 ## Single Cluster
 Although AbsaOSS/k3d-action strongly supports multi-cluster. Single cluster scenarios are very popular. The minimum single-cluster 
 configuration looks like this :
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create Single Cluster"
         with:
           cluster-name: "test-cluster-1"
@@ -82,7 +89,7 @@ k3d creates a cluster with one worker node (with [traefik](https://traefik.io/) 
 default load-balancer node. In real scenarios you might prefer to do some port mapping and disable default load balancer. 
 Such an action would look like this:
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create Single Cluster"
         with:
           cluster-name: "test-cluster-1"
@@ -92,6 +99,7 @@ Such an action would look like this:
             -p "5053:53/udp@agent[0]"
             --agents 3
             --no-lb
+            --image docker.io/rancher/k3s:v1.20.4-k3s1
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 ```
 The created cluster exposes two TCP (`:8083`,`:8443`) and one UDP (`:5053`) ports. The cluster comprises one server, three 
@@ -120,6 +128,7 @@ configured.
 ```yaml
 apiVersion: k3d.io/v1alpha2
 kind: Simple
+image: docker.io/rancher/k3s:v1.20.5-k3s1
 servers: 1
 agents: 3 # The action will overwrite this by 1
 ports:
@@ -157,7 +166,7 @@ manually.
 ### Multi Cluster on default network
 ```yaml
       - uses: actions/checkout@v2
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create 1st Cluster"
         with:
           cluster-name: "test-cluster-1"
@@ -168,7 +177,7 @@ manually.
             --agents 3
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create 2nd Cluster"
         with:
           cluster-name: "test-cluster-2"
@@ -181,7 +190,7 @@ manually.
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 ```
 Both clusters comprise one server node and three agents nodes. Because of port collision, each cluster must expose 
-different ports.
+different ports. Because k3s version is not specified, the clusters will run against latest k3s.
 
 For more details see: 
  - multi-cluster [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+clusters+on+default+network%22), 
@@ -191,7 +200,7 @@ For more details see:
    
 ### Multi Cluster on isolated networks
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create 1st Cluster in 172.20.0.0/24"
         id: test-cluster-1
         with:
@@ -206,7 +215,7 @@ For more details see:
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create 2nd Cluster in 172.20.1.0/24"
         id: test-cluster-2
         with:
@@ -239,7 +248,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
 [Source](./.github/workflows/multi-cluster-on-isolated-networks.yaml)
 ### Two pairs of clusters on two isolated networks
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create 1st Cluster in 172.20.0.0/24"
         with:
           cluster-name: "test-cluster-1-a"
@@ -250,7 +259,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create 2nd Cluster in 172.20.0.0/24"
         with:
           cluster-name: "test-cluster-2-a"
@@ -260,7 +269,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create 1st Cluster in 172.20.1.0/24"
         with:
           cluster-name: "test-cluster-1-b"
@@ -271,7 +280,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
             --no-lb
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
 
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create 2nd Cluster in 172.20.1.0/24"
         with:
           cluster-name: "test-cluster-2-b"
@@ -300,7 +309,7 @@ Example below demonstrates how to interact with imported docker registry:
 ```yaml
     steps:
       - uses: actions/checkout@v2
-      - uses: AbsaOSS/k3d-action@v1.3.1
+      - uses: AbsaOSS/k3d-action@v1.4.0
         id: single-cluster
         name: "Create single k3d Cluster with imported Registry"
         with:

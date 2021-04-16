@@ -19,7 +19,7 @@ jobs:
         name: "Create 2nd k3d Cluster"
         with:
           cluster-name: "test-cluster-2"
-          args: --config=.github/workflows/assets/2.yaml
+          args: --config=.github/workflows/assets/2.yaml # test: k3s version is different from 1.yaml
 
       - name: Cluster info
         run: |
