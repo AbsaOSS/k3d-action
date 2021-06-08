@@ -11,8 +11,6 @@ a private image registry and multi-cluster support.
     - [Multi Cluster on isolated networks](#multi-cluster-on-isolated-networks)
     - [Two pairs of clusters on two isolated networks](#two-pairs-of-clusters-on-two-isolated-networks)
 - [Private Registry](#private-registry)
-    - [Single Cluster](#single-cluster-with-private-registry)
-    - [Multi Cluster](#multi-cluster-with-private-registry)
 
 ## Introduction
 
@@ -21,6 +19,13 @@ In particular, E2E testing k8s based applications requires new approaches to con
 availability under heavy load or in the face of resource failure. **AbsaOSS/k3d-action allows to test the** _overall_ **application 
 functionality**. For instance, the E2E use-case is [operator](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) testing
  in [AbsaOSS/k8gb](https://github.com/AbsaOSS/k8gb). 
+
+<p align="center">
+  <a href="https://www.youtube.com/embed/eZcAvTb0rbA" title="Github Actions review and tutorial by #DevOps Toolkit">
+    <img src="https://user-images.githubusercontent.com/7195836/118461760-4a558880-b6fe-11eb-9ffc-5a87c87ed543.png">
+  </a>
+  <i>The full CI/CD pipeline tutorial with k3d-action by <a href="https://github.com/vfarcic">Viktor Farcic</a>.</i>
+</p>
 
 ## Getting started
 AbsaOSS/k3d-action runs [k3d](https://k3d.io/) which is a lightweight wrapper to run [k3s](https://k3s.io/) 
