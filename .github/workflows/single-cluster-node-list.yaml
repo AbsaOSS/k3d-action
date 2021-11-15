@@ -14,5 +14,5 @@ jobs:
           cluster-name: "node-list"
           args: >-
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
       - run: kubectl get nodes

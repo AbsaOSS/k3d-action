@@ -16,7 +16,7 @@ jobs:
           args: >-
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
       - name: "Docker repo demo"
         run: |
           docker build .github/workflows/assets/. -t myproj/demo:v1.0.0
@@ -34,5 +34,3 @@ jobs:
           kubectl get nodes -o wide
       - name: Network
         run: docker network inspect k3d-action-bridge-network
-
-

@@ -1,17 +1,13 @@
-apiVersion: k3d.io/v1alpha2
+apiVersion: k3d.io/v1alpha3
 kind: Simple
 name: k3s-k8gb-disco2
 servers: 1
 agents: 1
 kubeAPI:
-  hostIP: "0.0.0.0"
+  hostIP: 0.0.0.0
   hostPort: "6443"
-image: rancher/k3s:latest
+image: docker.io/rancher/k3s:latest
 network: nw03
-labels:
-  - label: foo=bar
-    nodeFilters:
-      - loadbalancer
 ports:
   - port: 0.0.0.0:8443:443
     nodeFilters:
@@ -26,13 +22,18 @@ env:
 options:
   k3d:
     wait: true
-    timeout: "60s"
+    timeout: 1m0s
     disableLoadbalancer: false
-    disableImageVolume: true
   k3s:
-    extraServerArgs:
-      - --no-deploy=metrics-server
-    extraAgentArgs: []
+    extraArgs:
+      - arg: --no-deploy=metrics-server
+        nodeFilters:
+          - server:*
   kubeconfig:
     updateDefaultKubeconfig: true
     switchCurrentContext: true
+  runtime:
+    labels:
+      - label: foo=bar
+        nodeFilters:
+          - loadbalancer

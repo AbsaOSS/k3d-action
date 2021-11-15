@@ -17,7 +17,7 @@ jobs:
           args: >-
             --agents 1
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
       - uses: ./
         id: test-cluster-2
         name: "Create 2nd k3d Cluster with Registry"
@@ -27,7 +27,7 @@ jobs:
           args: >-
             --agents 1
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - name: Cluster info
         run: |

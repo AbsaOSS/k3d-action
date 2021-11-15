@@ -5,11 +5,15 @@ a private image registry and multi-cluster support.
 
 - [Introduction](#introduction)
 - [Getting started](#getting-started)
+  - [Inputs](#inputs)
+  - [Outputs](#outputs)
+  - [Version mapping](#version-mapping)
 - [Single Cluster](#single-cluster)
+  - [Config file support](#config-file-support)
 - [Multi Cluster](#multi-cluster)
-    - [Multi Clusters on default network](#multi-cluster-on-default-network)
-    - [Multi Cluster on isolated networks](#multi-cluster-on-isolated-networks)
-    - [Two pairs of clusters on two isolated networks](#two-pairs-of-clusters-on-two-isolated-networks)
+  - [Multi Cluster on default network](#multi-cluster-on-default-network)
+  - [Multi Cluster on isolated networks](#multi-cluster-on-isolated-networks)
+  - [Two pairs of clusters on two isolated networks](#two-pairs-of-clusters-on-two-isolated-networks)
 - [Private Registry](#private-registry)
 
 ## Introduction
@@ -63,8 +67,9 @@ Output attributes are accessible via `id`, e.g.:
 For more details see: [Multi Cluster on isolated networks](#multi-cluster-on-isolated-networks)
 
 ### Version mapping
-Implementation of additional features brings complexity and sometimes may happen that extra feature is broken in special cases.
-To prevent potential issues due to usage such versions, the k3d version is predefined.
+
+Implementation of additional features brings complexity and sometimes it may happen that extra feature is broken in special cases.
+To prevent potential issues, the `k3d` version is fixed according to the mapping below:
 
 | k3d-action |   k3d   |           k3s           |
 |:----------:|:-------:|:-----------------------:|
@@ -73,9 +78,10 @@ To prevent potential issues due to usage such versions, the k3d version is prede
 | v1.3.0     |  [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) | [rancher/k3s:v1.20.4-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.4%2Bk3s1)|
 | v1.4.0     |  [v4.4.1](https://github.com/rancher/k3d/releases/tag/v4.4.1) | [rancher/k3s:v1.20.8-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.8%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
 | v1.5.0     |  [v4.4.7](https://github.com/rancher/k3d/releases/tag/v4.4.7) | [rancher/k3s:v1.21.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.21.2%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
+| v1.6.0     |  [v5.1.0](https://github.com/rancher/k3d/releases/tag/v5.1.0) | [rancher/k3s:v1.22.3+k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.22.3%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
 
-From `v1.4.0` would k3d-action users set k3s version explicitly via [configuration](#config-file-support) or
-argument e.g.`--image docker.io/rancher/k3s:v1.20.4-k3s1` otherwise k3d specifies which version will be used.
+Starting from `k3d-action` `v1.4.0` users can explicitly set [`k3s` image version](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated) via [configuration](#config-file-support) or
+argument e.g.`--image docker.io/rancher/k3s:v1.20.4-k3s1` otherwise k3d uses default version accordng to the mapping above.
 
 For further k3s details see:
 - docker [rancher/k3s](https://hub.docker.com/r/rancher/k3s/tags?page=2&ordering=last_updated)
@@ -85,7 +91,7 @@ For further k3s details see:
 Although AbsaOSS/k3d-action strongly supports multi-cluster. Single cluster scenarios are very popular. The minimum single-cluster
 configuration looks like this :
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create Single Cluster"
         with:
           cluster-name: "test-cluster-1"
@@ -95,18 +101,18 @@ k3d creates a cluster with one worker node (with [traefik](https://traefik.io/) 
 default load-balancer node. In real scenarios you might prefer to do some port mapping and disable default load balancer.
 Such an action would look like this:
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create Single Cluster"
         with:
           cluster-name: "test-cluster-1"
           args: >-
-            -p "8083:80@agent[0]"
-            -p "8443:443@agent[0]"
-            -p "5053:53/udp@agent[0]"
+            -p "8083:80@agent:0:direct"
+            -p "8443:443@agent:0:direct"
+            -p "5053:53/udp@agent:0:direct"
             --agents 3
             --no-lb
             --image docker.io/rancher/k3s:v1.20.4-k3s1
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 ```
 The created cluster exposes two TCP (`:8083`,`:8443`) and one UDP (`:5053`) ports. The cluster comprises one server, three
 agents and no load balancers. [k3s-server-argument](https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/#k3s-server-cli-help)
@@ -132,7 +138,7 @@ All you need to do is to place configuration file somewhere into your project. H
 arguments will always take precedence over configuration, so the previous example will result in only one agent, not three as
 configured.
 ```yaml
-apiVersion: k3d.io/v1alpha2
+apiVersion: k3d.io/v1alpha3
 kind: Simple
 image: docker.io/rancher/k3s:v1.20.5-k3s1
 servers: 1
@@ -140,19 +146,18 @@ agents: 3 # The action will overwrite this by 1
 ports:
   - port: 0.0.0.0:80:80
     nodeFilters:
-      - agent[0]
+      - agent:0:direct
   - port: 0.0.0.0:443:443
     nodeFilters:
-      - agent[0]
+      - agent:0:direct
   - port: 0.0.0.0:5053:53/udp
     nodeFilters:
-      - agent[0]
+      - agent:0:direct
 options:
   k3d:
     wait: true
     timeout: "60s"
     disableLoadbalancer: true
-    disableImageVolume: true
   k3s:
     extraServerArgs:
       - --no-deploy=traefik,servicelb,metrics-server
@@ -172,28 +177,28 @@ manually.
 ### Multi Cluster on default network
 ```yaml
       - uses: actions/checkout@v2
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create 1st Cluster"
         with:
           cluster-name: "test-cluster-1"
           args: >-
-            -p "80:80@agent[0]"
-            -p "443:443@agent[0]"
-            -p "5053:53/udp@agent[0]"
+            -p "80:80@agent:0:direct"
+            -p "443:443@agent:0:direct"
+            -p "5053:53/udp@agent:0:direct"
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
-      - uses: AbsaOSS/k3d-action@v1.5.0
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create 2nd Cluster"
         with:
           cluster-name: "test-cluster-2"
           args: >-
-            -p "81:80@agent[0]"
-            -p "444:443@agent[0]"
-            -p "5054:53/udp@agent[0]"
+            -p "81:80@agent:0:direct"
+            -p "444:443@agent:0:direct"
+            -p "5054:53/udp@agent:0:direct"
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 ```
 Both clusters comprise one server node and three agents nodes. Because of port collision, each cluster must expose
 different ports. Because k3s version is not specified, the clusters will run against latest k3s.
@@ -206,7 +211,7 @@ For more details see:
 
 ### Multi Cluster on isolated networks
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create 1st Cluster in 172.20.0.0/24"
         id: test-cluster-1
         with:
@@ -214,14 +219,14 @@ For more details see:
           network: "nw01"
           subnet-CIDR: "172.20.0.0/24"
           args: >-
-            -p "80:80@agent[0]"
-            -p "443:443@agent[0]"
-            -p "5053:53/udp@agent[0]"
+            -p "80:80@agent:0:direct"
+            -p "443:443@agent:0:direct"
+            -p "5053:53/udp@agent:0:direct"
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create 2nd Cluster in 172.20.1.0/24"
         id: test-cluster-2
         with:
@@ -229,12 +234,12 @@ For more details see:
           network: "nw02"
           subnet-CIDR: "172.20.1.0/24"
           args: >-
-            -p "81:80@agent[0]"
-            -p "444:443@agent[0]"
-            -p "5054:53/udp@agent[0]"
+            -p "81:80@agent:0:direct"
+            -p "444:443@agent:0:direct"
+            -p "5054:53/udp@agent:0:direct"
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - name: Cluster info
         run: |
@@ -254,7 +259,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
 [Source](./.github/workflows/multi-cluster-on-isolated-networks.yaml)
 ### Two pairs of clusters on two isolated networks
 ```yaml
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create 1st Cluster in 172.20.0.0/24"
         with:
           cluster-name: "test-cluster-1-a"
@@ -263,9 +268,9 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
           args: >-
             --agents 1
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create 2nd Cluster in 172.20.0.0/24"
         with:
           cluster-name: "test-cluster-2-a"
@@ -273,9 +278,9 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
           args: >-
             --agents 1
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create 1st Cluster in 172.20.1.0/24"
         with:
           cluster-name: "test-cluster-1-b"
@@ -284,9 +289,9 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
           args: >-
             --agents 1
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         name: "Create 2nd Cluster in 172.20.1.0/24"
         with:
           cluster-name: "test-cluster-2-b"
@@ -294,7 +299,7 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
           args: >-
             --agents 1
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 ```
 As you can see, `test-cluster-2-a` doesn't specify subnet-CIDR, because it inherits CIDR from
 `test-cluster-1-a`, but network `nw01` is shared. The same for `test-cluster-2-b` and `test-cluster-1-b`.
@@ -315,7 +320,7 @@ Example below demonstrates how to interact with imported docker registry:
 ```yaml
     steps:
       - uses: actions/checkout@v2
-      - uses: AbsaOSS/k3d-action@v1.5.0
+      - uses: AbsaOSS/k3d-action@v1.6.0
         id: single-cluster
         name: "Create single k3d Cluster with imported Registry"
         with:
@@ -323,7 +328,7 @@ Example below demonstrates how to interact with imported docker registry:
           args: >-
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
       - name: "Docker repo demo"
         run: |
           docker build . -t myproj/demo:v1.0.0
