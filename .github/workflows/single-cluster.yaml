@@ -14,12 +14,12 @@ jobs:
         with:
           cluster-name: "test-cluster-1"
           args: >-
-            -p "80:80@agent[0]"
-            -p "443:443@agent[0]"
-            -p "5053:53/udp@agent[0]"
+            -p "80:80@agent:0:direct"
+            -p "443:443@agent:0:direct"
+            -p "5053:53/udp@agent:0:direct"
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
       - name: Cluster info
         run: |
           echo ${{ steps.single-cluster.outputs.network }} ${{ steps.single-cluster.outputs.subnet-CIDR }}

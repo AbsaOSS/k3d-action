@@ -18,7 +18,7 @@ jobs:
           args: >-
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - uses: ./
         id: test-cluster-1-b
@@ -29,7 +29,7 @@ jobs:
           args: >-
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - uses: ./
         id: test-cluster-2-a
@@ -41,7 +41,7 @@ jobs:
           args: >-
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - uses: ./
         id: test-cluster-2-b
@@ -52,7 +52,7 @@ jobs:
           args: >-
             --agents 3
             --no-lb
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - name: Cluster info
         run: |

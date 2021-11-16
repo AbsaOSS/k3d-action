@@ -21,7 +21,7 @@ jobs:
             --agents 1
             --no-lb
             --image docker.io/rancher/k3s:v1.21.2-k3s1
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - uses: ./
         id: test-cluster-1-b
@@ -35,7 +35,7 @@ jobs:
             --agents 1
             --no-lb
             --image docker.io/rancher/k3s:v1.21.2-k3s1
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - uses: ./
         id: test-cluster-2-a
@@ -50,7 +50,7 @@ jobs:
             --agents 1
             --no-lb
             --image docker.io/rancher/k3s:v1.21.2-k3s1
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - uses: ./
         id: test-cluster-2-b
@@ -64,7 +64,7 @@ jobs:
             --agents 1
             --no-lb
             --image docker.io/rancher/k3s:v1.21.2-k3s1
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - name: Cluster info
         run: |
@@ -101,4 +101,3 @@ jobs:
         env:
           REGISTRY_PORT: 5001
         run: ./run.sh test-registry
-
