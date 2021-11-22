@@ -9,74 +9,74 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
-        id: test-cluster-1-a
-        name: "Create 1st k3d Cluster in 172.20.0.0/24"
+        name: "Create 1st Cluster in 172.18.0.0/16"
         with:
-          cluster-name: "test-cluster-1-a"
-          network: "nw01"
-          subnet-CIDR: "172.20.0.0/24"
+          cluster-name: "test-cluster-1"
           args: >-
+            -p "80:80@agent:0:direct"
+            -p "443:443@agent:0:direct"
+            -p "5053:53/udp@agent:0:direct"
             --agents 3
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+            --network "nw01"
 
       - uses: ./
-        id: test-cluster-1-b
-        name: "Create 2nd k3d Cluster in 172.20.0.0/24"
+        name: "Create 2nd Cluster in 172.18.0.0/16"
         with:
-          cluster-name: "test-cluster-2-a"
-          network: "nw01"
+          cluster-name: "test-cluster-2"
           args: >-
+            -p "81:80@agent:0:direct"
+            -p "444:443@agent:0:direct"
+            -p "5054:53/udp@agent:0:direct"
             --agents 3
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+            --network "nw01"
 
       - uses: ./
-        id: test-cluster-2-a
-        name: "Create 1st k3d Cluster in 172.20.1.0/24"
+        name: "Create 1st Cluster in 172.19.0.0/16"
         with:
-          cluster-name: "test-cluster-1-b"
-          network: "nw02"
-          subnet-CIDR: "172.20.1.0/24"
+          cluster-name: "test-cluster-3"
           args: >-
+            -p "82:80@agent:0:direct"
+            -p "445:443@agent:0:direct"
+            -p "5055:53/udp@agent:0:direct"
             --agents 3
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+            --network "nw02"
 
       - uses: ./
-        id: test-cluster-2-b
-        name: "Create 2nd k3d Cluster in 172.20.1.0/24"
+        name: "Create 2nd Cluster in 172.19.0.0/16"
         with:
-          cluster-name: "test-cluster-2-b"
-          network: "nw02"
+          cluster-name: "test-cluster-4"
           args: >-
+            -p "83:80@agent:0:direct"
+            -p "446:443@agent:0:direct"
+            -p "5056:53/udp@agent:0:direct"
             --agents 3
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+            --network "nw02"
 
       - name: Cluster info
         run: |
-          echo
-          echo test-cluster-1-a: ${{ steps.test-cluster-1-a.outputs.network }} ${{ steps.test-cluster-1-a.outputs.subnet-CIDR }}
-          echo test-cluster-1-b: ${{ steps.test-cluster-1-b.outputs.network }} ${{ steps.test-cluster-1-b.outputs.subnet-CIDR }}
-          echo test-cluster-2-a: ${{ steps.test-cluster-2-a.outputs.network }} ${{ steps.test-cluster-2-a.outputs.subnet-CIDR }}
-          echo test-cluster-2-b: ${{ steps.test-cluster-2-b.outputs.network }} ${{ steps.test-cluster-2-b.outputs.subnet-CIDR }}
-          echo
-          kubectl cluster-info --context k3d-test-cluster-1-a
-          kubectl cluster-info --context k3d-test-cluster-2-a
-          kubectl cluster-info --context k3d-test-cluster-1-b
-          kubectl cluster-info --context k3d-test-cluster-2-b
+          kubectl cluster-info --context k3d-test-cluster-1
+          kubectl cluster-info --context k3d-test-cluster-2
+          kubectl cluster-info --context k3d-test-cluster-3
+          kubectl cluster-info --context k3d-test-cluster-4
 
       - name: Nodes
         run: |
           docker ps -a
-          kubectl config use-context k3d-test-cluster-1-a
+          kubectl config use-context k3d-test-cluster-1
           kubectl get nodes -o wide
-          kubectl config use-context k3d-test-cluster-1-b
+          kubectl config use-context k3d-test-cluster-2
           kubectl get nodes -o wide
-          kubectl config use-context k3d-test-cluster-2-a
+          kubectl config use-context k3d-test-cluster-3
           kubectl get nodes -o wide
-          kubectl config use-context k3d-test-cluster-2-b
+          kubectl config use-context k3d-test-cluster-4
           kubectl get nodes -o wide
 
       - name: Network

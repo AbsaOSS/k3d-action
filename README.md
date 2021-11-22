@@ -1,7 +1,7 @@
 # AbsaOSS/k3d-action
 A GitHub Action to run lightweight ephemeral Kubernetes clusters during workflow.
 Fundamental advantage of this action is a full customization of embedded k3s clusters. In addition, it provides
-a private image registry and multi-cluster support.
+multi-cluster support.
 
 - [Introduction](#introduction)
 - [Getting started](#getting-started)
@@ -42,24 +42,6 @@ AbsaOSS/k3d-action defines several input attributes and two outputs:
 - `cluster-name` (Required) Cluster name.
 
 - `args` (Optional) list of k3d arguments defined by [k3d command tree](https://k3d.io/usage/commands/)
-
-- `network` (Optional) Cluster network name. AbsaOSS/k3d-action primarily creates clusters in the default bridge-network
-  called  `k3d-action-bridge-network` with subnet CIDR `172.16.0.0/24`. You can leave this field empty until you  need to
-  have a multiple clusters in different subnets.
-
-- `subnet-CIDR` (Optional) Cluster subnet CIDR. Provide new CIDR only if `network` is defined first time.
-
-### Outputs
-
-- `network` Detected k3s cluster network
-- `subnet-CIDR` Detected k3s subnet CIDR
-
-Output attributes are accessible via `id`, e.g.:
-```yaml
- ${{ steps.<id>.outputs.network }} ${{ steps.<id>.outputs.subnet-CIDR }}
-```
-
-For more details see: [Multi Cluster on isolated networks](#multi-cluster-on-isolated-networks)
 
 ### Version mapping
 
@@ -121,7 +103,6 @@ From v1.2.0 you can configure action via config files or mix arguments together 
 you want to share the configuration for local testing and testing within k3d-action.
 ```yaml
       - uses: ./
-        id: single-cluster
         name: "Create single k3d Cluster"
         with:
           cluster-name: "test-cluster-1"
@@ -165,15 +146,22 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
 [Source action](./.github/workflows/single-cluster-config.yaml), [Source config](./.github/workflows/assets/1.yaml)
 
 ## Multi Cluster
-AbsaOSS/k3d-action primarily creates clusters in the default bridge-network called  `k3d-action-bridge-network` with
-subnet CIDR `172.16.0.0/24`. To create clusters in the new isolated networks, you must set `network` and `subnet-CIDR`
-manually.
+k3d creates a bridge-network for each separate cluster or attaches the created cluster to an 
+existing network.
 
-### Multi Cluster on default network
+When you create a cluster named `test-cluster-1`, k3d will automatically create a network 
+named `k3d-test-cluster-1` with the range `172.18.0.0/16`. When you create a second cluster 
+`test-cluster-2`, k3d automatically creates a network named `k3d-test-cluster-2` with a 
+range of `172.19.0.0/16`. Other clusters will have ranges `172.20.0.0/16`,`172.21.0.0/16` etc.
+
+### Multi Cluster setup
+The following example creates a total of four clusters, the first two are created on 
+the network `nw01, 172.18.0.0/16`, the next two clusters are created on the network 
+`nw02, 172.19.0.0/16`. 
+
 ```yaml
-      - uses: actions/checkout@v2
       - uses: AbsaOSS/k3d-action@v2
-        name: "Create 1st Cluster"
+        name: "Create 1st Cluster in 172.18.0.0/16"
         with:
           cluster-name: "test-cluster-1"
           args: >-
@@ -183,8 +171,10 @@ manually.
             --agents 3
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+            --network "nw01"
+
       - uses: AbsaOSS/k3d-action@v2
-        name: "Create 2nd Cluster"
+        name: "Create 2nd Cluster in 172.18.0.0/16"
         with:
           cluster-name: "test-cluster-2"
           args: >-
@@ -194,110 +184,35 @@ manually.
             --agents 3
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
-```
-Both clusters comprise one server node and three agents nodes. Because of port collision, each cluster must expose
-different ports. Because k3s version is not specified, the clusters will run against latest k3s.
+            --network "nw01"
 
-For more details see:
-- multi-cluster [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+clusters+on+default+network%22),
-  [Source](./.github/workflows/multi-cluster.yaml)
-- multi-cluster with config [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+clusters+on+default+network+with+config%22),
-  [Source action](./.github/workflows/multi-cluster-config.yaml), [Source config1](./.github/workflows/assets/1.yaml), [Source config2](./.github/workflows/assets/2.yaml)
-
-### Multi Cluster on isolated networks
-```yaml
       - uses: AbsaOSS/k3d-action@v2
-        name: "Create 1st Cluster in 172.20.0.0/24"
-        id: test-cluster-1
+          name: "Create 1st Cluster in 172.19.0.0/16"
+          with:
+            cluster-name: "test-cluster-3"
+            args: >-
+              -p "82:80@agent:0:direct"
+              -p "445:443@agent:0:direct"
+              -p "5055:53/udp@agent:0:direct"
+              --agents 3
+              --no-lb
+              --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+              --network "nw02"
+
+      - uses: AbsaOSS/k3d-action@v2
+        name: "Create 2nd Cluster in 172.19.0.0/16"
         with:
-          cluster-name: "test-cluster-1"
-          network: "nw01"
-          subnet-CIDR: "172.20.0.0/24"
+          cluster-name: "test-cluster-4"
           args: >-
-            -p "80:80@agent:0:direct"
-            -p "443:443@agent:0:direct"
-            -p "5053:53/udp@agent:0:direct"
+            -p "83:80@agent:0:direct"
+            -p "446:443@agent:0:direct"
+            -p "5056:53/udp@agent:0:direct"
             --agents 3
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
-
-      - uses: AbsaOSS/k3d-action@v2
-        name: "Create 2nd Cluster in 172.20.1.0/24"
-        id: test-cluster-2
-        with:
-          cluster-name: "test-cluster-2"
-          network: "nw02"
-          subnet-CIDR: "172.20.1.0/24"
-          args: >-
-            -p "81:80@agent:0:direct"
-            -p "444:443@agent:0:direct"
-            -p "5054:53/udp@agent:0:direct"
-            --agents 3
-            --no-lb
-            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
-
-      - name: Cluster info
-        run: |
-          echo test-cluster-1: ${{ steps.test-cluster-1.outputs.network }} ${{ steps.test-cluster-1.outputs.subnet-CIDR }}
-          echo test-cluster-2: ${{ steps.test-cluster-2.outputs.network }} ${{ steps.test-cluster-2.outputs.subnet-CIDR }}
+            --network "nw02"
 ```
-AbsaOSS/k3d-action creates two identical clusters in two different bridge networks. Because optional argument `id` exists,
-we can list the output arguments in the `Cluster Information` step.
-
-output:
-```shell script
-    test-cluster-1: nw01 172.20.0.0/24
-    test-cluster-2: nw02 172.20.1.0/24
-```
-
-For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+clusters+on+two+isolated+networks%22),
-[Source](./.github/workflows/multi-cluster-on-isolated-networks.yaml)
-### Two pairs of clusters on two isolated networks
-```yaml
-      - uses: AbsaOSS/k3d-action@v2
-        name: "Create 1st Cluster in 172.20.0.0/24"
-        with:
-          cluster-name: "test-cluster-1-a"
-          network: "nw01"
-          subnet-CIDR: "172.20.0.0/24"
-          args: >-
-            --agents 1
-            --no-lb
-            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
-
-      - uses: AbsaOSS/k3d-action@v2
-        name: "Create 2nd Cluster in 172.20.0.0/24"
-        with:
-          cluster-name: "test-cluster-2-a"
-          network: "nw01"
-          args: >-
-            --agents 1
-            --no-lb
-            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
-
-      - uses: AbsaOSS/k3d-action@v2
-        name: "Create 1st Cluster in 172.20.1.0/24"
-        with:
-          cluster-name: "test-cluster-1-b"
-          network: "nw02"
-          subnet-CIDR: "172.20.1.0/24"
-          args: >-
-            --agents 1
-            --no-lb
-            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
-
-      - uses: AbsaOSS/k3d-action@v2
-        name: "Create 2nd Cluster in 172.20.1.0/24"
-        with:
-          cluster-name: "test-cluster-2-b"
-          network: "nw02"
-          args: >-
-            --agents 1
-            --no-lb
-            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
-```
-As you can see, `test-cluster-2-a` doesn't specify subnet-CIDR, because it inherits CIDR from
-`test-cluster-1-a`, but network `nw01` is shared. The same for `test-cluster-2-b` and `test-cluster-1-b`.
+AbsaOSS/k3d-action creates four identical clusters in two different bridge networks. 
 
 For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks%22),
 [Source](./.github/workflows/multi-cluster-two-piars.yaml)
@@ -316,7 +231,6 @@ Example below demonstrates how to interact with imported docker registry:
     steps:
       - uses: actions/checkout@v2
       - uses: AbsaOSS/k3d-action@v2
-        id: single-cluster
         name: "Create single k3d Cluster with imported Registry"
         with:
           cluster-name: test-cluster-1

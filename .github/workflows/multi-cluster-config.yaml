@@ -1,31 +1,26 @@
-name: Multi cluster; two clusters on default network with config
+name: Two clusters on default networks with config
 
 on:
   [workflow_dispatch, push]
 jobs:
   k3d-multicluster-demo:
-    name: Two clusters on default network with config
+    name: Two clusters on default networks with config
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - uses: ./
-        id: test-cluster-1
         name: "Create 1st k3d Cluster"
         with:
           cluster-name: "test-cluster-1"
           args: --config=.github/workflows/assets/1.yaml
       - uses: ./
-        id: test-cluster-2
         name: "Create 2nd k3d Cluster"
         with:
           cluster-name: "test-cluster-2"
-          args: --config=.github/workflows/assets/2.yaml # test: k3s version is different from 1.yaml
+          args: --config=.github/workflows/assets/3.yaml # test: k3s version is different from 1.yaml
 
       - name: Cluster info
         run: |
-          echo test-cluster-1: ${{ steps.test-cluster-1.outputs.network }} ${{ steps.test-cluster-1.outputs.subnet-CIDR }}
-          echo test-cluster-2: ${{ steps.test-cluster-2.outputs.network }} ${{ steps.test-cluster-2.outputs.subnet-CIDR }}
-          echo
           kubectl cluster-info --context k3d-test-cluster-1 && kubectl cluster-info --context k3d-test-cluster-2
       - name: Nodes
         run: |
@@ -35,4 +30,7 @@ jobs:
           kubectl config use-context k3d-test-cluster-2
           kubectl get nodes -o wide
       - name: Network
-        run: docker network inspect k3d-action-bridge-network
+        run: |
+          docker network inspect nw01
+          docker network inspect nw02
+

@@ -3,6 +3,7 @@ kind: Simple
 # image: default k3s version
 servers: 1
 agents: 3
+network: nw02
 ports:
   - port: 0.0.0.0:83:80
     nodeFilters:
