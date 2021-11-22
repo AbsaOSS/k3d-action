@@ -33,13 +33,6 @@ inputs:
   subnet-CIDR:
     description: "(Optional) Cluster subnet CIDR. Default value 172.16.0.0/24 in case network is not set."
     required: false
-  use-default-registry:
-    description: "(Optional) Autogenerate docker registry accessible from the cluster."
-    required: false
-    default: "false"
-  registry-port:
-    description: "(Optional) Registry port. Default value 5000."
-    required: false
 outputs:
   network:
     description: "Detected k3d version"
@@ -58,5 +51,4 @@ runs:
         ARGS: ${{ inputs.args }}
         NETWORK: ${{ inputs.network }}
         SUBNET_CIDR: ${{ inputs.subnet-CIDR }}
-        USE_DEFAULT_REGISTRY: ${{ inputs.use-default-registry }}
-        REGISTRY_PORT: ${{ inputs.registry-port }}
+

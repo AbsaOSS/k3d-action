@@ -29,9 +29,6 @@ K3D_VERSION=v5.1.0
 DEFAULT_NETWORK=k3d-action-bridge-network
 DEFAULT_SUBNET=172.16.0.0/24
 NOT_FOUND=k3d-not-found-network
-REGISTRY_HOSTNAME=registry.localhost
-REGISTRY_NAME=registry.local
-REGISTRY_CONFIG_PATH="$(pwd)/registries-local.yaml"
 DEFAULT_REGISTRY_PORT=5000
 
 #######################
@@ -57,14 +54,6 @@ usage(){
 
                         SUBNET_CIDR (Optional) If not set than default 172.16.0.0/24 is used. Variable requires
                                               NETWORK to be set.
-
-                        USE_DEFAULT_REGISTRY (Optional) If not set than default false. If true provides local docker registry
-                                              registry.localhost:5000 without TLS and authentication.
-
-                        REGISTRY_PORT (Optional) Registry port. Default value 5000.
-
-      test-registry
-                        REGISTRY_PORT (Optional) Registry port. Default value 5000.
 EOF
 }
 
@@ -114,14 +103,6 @@ deploy(){
       subnet=$(docker network inspect "$network" -f '{{(index .IPAM.Config 0).Subnet}}')
     fi
 
-    if [[ "$registry" == "true" ]]
-    then
-      echo -e "${YELLOW}attaching registry to ${CYAN}$network ${NC}"
-      registry "$network" "$registryPort"
-      registryArg="--volume \"${REGISTRY_CONFIG_PATH}:/etc/rancher/k3s/registries.yaml\""
-      cat "${REGISTRY_CONFIG_PATH}"
-    fi
-
     # Setup GitHub Actions outputs
     echo "::set-output name=network::$network"
     echo "::set-output name=subnet-CIDR::$subnet"
@@ -132,59 +113,6 @@ deploy(){
     echo -e "\existing_network${YELLOW}Deploy cluster ${CYAN}$name ${NC}"
     eval "k3d cluster create $name --wait $arguments --network $network $registryArg"
     wait_for_nodes
-}
-
-# see: https://rancher.com/docs/k3s/latest/en/installation/private-registry/#mirrors
-registry(){
-    local network=$1
-    local port=$2
-    # create registry if not exists
-    if [ ! "$(docker ps -q -f name=${REGISTRY_NAME})" ];
-    then
-      echo -e "${YELLOW}Inject registry ${CYAN}${REGISTRY_NAME}:${port}${NC}"
-      cat > "${REGISTRY_CONFIG_PATH}" <<EOF
-mirrors:
-  "$REGISTRY_HOSTNAME:$port":
-    endpoint:
-      - "http://$REGISTRY_NAME:$port"
-EOF
-      docker volume create local_registry
-      docker container run -d --name ${REGISTRY_NAME} -v local_registry:/var/lib/registry --restart always -p "${port}":5000 registry:2
-    fi
-    # connect registry to network if not connected yet
-    containsRegistry=$(docker network inspect "$network" | grep ${REGISTRY_NAME} || echo $NOT_FOUND)
-    if [[ "$containsRegistry" == "$NOT_FOUND" ]]
-    then
-      docker network connect "$network" ${REGISTRY_NAME}
-    fi
-}
-
-# test_registry check registry from outside the cluster
-test_registry(){
-  local registryPort=${REGISTRY_PORT:-$DEFAULT_REGISTRY_PORT}
-  local tag=localhost:${registryPort}/k3d-action-dummy:v0.0.1
-  echo -e "${CYAN}Test whether local registry is running${NC}"
-  echo -e "${YELLOW}push and remove image${CYAN} ${tag}${NC}"
-  docker build -t "${tag}" -f- . &> /dev/null <<EOF
-FROM scratch
-LABEL type=dummy
-EOF
-  docker push "${tag}"
-  docker image rm "${tag}" &> /dev/null
-  echo -e "${YELLOW}pull${CYAN} ${tag}${NC}"
-  docker pull "${tag}"
-  docker images
-}
-
-
-init_registry(){
-    # create registry if not exists
-    local port=$1
-    local registryName=$2
-    if [ ! "$(docker ps -q -f name="${registryName}")" ];
-    then
-      k3d registry create "${registryName}" --image=docker.io/library/registry:2 --port="${port}"
-    fi
 }
 
 # waits until all nodes are ready
@@ -235,9 +163,6 @@ fi
 case "$1" in
     "deploy")
        deploy
-    ;;
-    "test-registry")
-       test_registry
     ;;
 #    "<put new command here>")
 #       command_handler
