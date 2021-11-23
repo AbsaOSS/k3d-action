@@ -11,9 +11,7 @@ multi-cluster support.
 - [Single Cluster](#single-cluster)
   - [Config file support](#config-file-support)
 - [Multi Cluster](#multi-cluster)
-  - [Multi Cluster on default network](#multi-cluster-on-default-network)
-  - [Multi Cluster on isolated networks](#multi-cluster-on-isolated-networks)
-  - [Two pairs of clusters on two isolated networks](#two-pairs-of-clusters-on-two-isolated-networks)
+  - [Multi Cluster setup](#multi-cluster-setup)
 - [Private Registry](#private-registry)
 
 ## Introduction
