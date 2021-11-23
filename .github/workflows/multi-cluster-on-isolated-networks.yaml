@@ -1,4 +1,4 @@
-name: Multi cluster; two clusters on two isolated networks
+name: Two clusters on two isolated networks
 
 on:
   [workflow_dispatch, push]
@@ -9,12 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
-        id: test-cluster-1
-        name: "Create 1st k3d Cluster in 172.20.0.0/24"
+        name: "Create 1st k3d Cluster in 172.18.0.0/16"
         with:
           cluster-name: "test-cluster-1"
-          network: "nw01"
-          subnet-CIDR: "172.20.0.0/24"
           args: >-
             -p "80:80@agent:0:direct"
             -p "443:443@agent:0:direct"
@@ -22,14 +19,11 @@ jobs:
             --agents 3
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
-
+            --network nw01
       - uses: ./
-        id: test-cluster-2
-        name: "Create 1nd k3d Cluster in 172.20.1.0/24"
+        name: "Create 1nd k3d Cluster in 172.19.0.0/16"
         with:
           cluster-name: "test-cluster-2"
-          network: "nw02"
-          subnet-CIDR: "172.20.1.0/24"
           args: >-
             -p "81:80@agent:0:direct"
             -p "444:443@agent:0:direct"
@@ -37,12 +31,9 @@ jobs:
             --agents 3
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
-
+            --network nw02
       - name: Cluster info
         run: |
-          echo test-cluster-1: ${{ steps.test-cluster-1.outputs.network }} ${{ steps.test-cluster-1.outputs.subnet-CIDR }}
-          echo test-cluster-2: ${{ steps.test-cluster-2.outputs.network }} ${{ steps.test-cluster-2.outputs.subnet-CIDR }}
-          echo
           kubectl cluster-info --context k3d-test-cluster-1 && kubectl cluster-info --context k3d-test-cluster-2
       - name: Nodes
         run: |

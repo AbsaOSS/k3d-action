@@ -3,6 +3,7 @@ kind: Simple
 image: docker.io/rancher/k3s:v1.21.2-k3s1
 servers: 1
 agents: 3
+network: nw01
 ports:
   - port: 0.0.0.0:81:80
     nodeFilters:

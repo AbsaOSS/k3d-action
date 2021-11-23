@@ -27,19 +27,6 @@ inputs:
   args:
     description: "(Optional) Additional arguments to k3d cluster. see: https://k3d.io/usage/commands/"
     required: false
-  network:
-    description: "(Optional) Cluster network. Default value k3d-action-bridge-network"
-    required: false
-  subnet-CIDR:
-    description: "(Optional) Cluster subnet CIDR. Default value 172.16.0.0/24 in case network is not set."
-    required: false
-outputs:
-  network:
-    description: "Detected k3d version"
-    value: ${{ steps.main.outputs.network }}
-  subnet-CIDR:
-    description: "Detected k3d network subnet"
-    value: ${{ steps.main.outputs.subnet-CIDR }}
 runs:
   using: composite
   steps:
@@ -49,6 +36,3 @@ runs:
       env:
         CLUSTER_NAME: ${{ inputs.cluster-name }}
         ARGS: ${{ inputs.args }}
-        NETWORK: ${{ inputs.network }}
-        SUBNET_CIDR: ${{ inputs.subnet-CIDR }}
-
