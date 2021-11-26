@@ -6,7 +6,6 @@ multi-cluster support.
 - [Introduction](#introduction)
 - [Getting started](#getting-started)
   - [Inputs](#inputs)
-  - [Outputs](#outputs)
   - [Version mapping](#version-mapping)
 - [Single Cluster](#single-cluster)
   - [Config file support](#config-file-support)
@@ -133,9 +132,10 @@ options:
     timeout: "60s"
     disableLoadbalancer: true
   k3s:
-    extraServerArgs:
-      - --no-deploy=traefik,servicelb,metrics-server
-    extraAgentArgs: []
+    extraArgs:
+      - arg: --no-deploy=traefik,servicelb,metrics-server
+        nodeFilters:
+          - server:*
   kubeconfig:
     updateDefaultKubeconfig: true
     switchCurrentContext: true
@@ -144,18 +144,18 @@ For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query
 [Source action](./.github/workflows/single-cluster-config.yaml), [Source config](./.github/workflows/assets/1.yaml)
 
 ## Multi Cluster
-k3d creates a bridge-network for each separate cluster or attaches the created cluster to an 
+k3d creates a bridge-network for each separate cluster or attaches the created cluster to an
 existing network.
 
-When you create a cluster named `test-cluster-1`, k3d will automatically create a network 
-named `k3d-test-cluster-1` with the range `172.18.0.0/16`. When you create a second cluster 
-`test-cluster-2`, k3d automatically creates a network named `k3d-test-cluster-2` with a 
+When you create a cluster named `test-cluster-1`, k3d will automatically create a network
+named `k3d-test-cluster-1` with the range `172.18.0.0/16`. When you create a second cluster
+`test-cluster-2`, k3d automatically creates a network named `k3d-test-cluster-2` with a
 range of `172.19.0.0/16`. Other clusters will have ranges `172.20.0.0/16`,`172.21.0.0/16` etc.
 
 ### Multi Cluster setup
-The following example creates a total of four clusters, the first two are created on 
-the network `nw01, 172.18.0.0/16`, the next two clusters are created on the network 
-`nw02, 172.19.0.0/16`. 
+The following example creates a total of four clusters, the first two are created on
+the network `nw01, 172.18.0.0/16`, the next two clusters are created on the network
+`nw02, 172.19.0.0/16`.
 
 ```yaml
       - uses: AbsaOSS/k3d-action@v2
@@ -210,7 +210,7 @@ the network `nw01, 172.18.0.0/16`, the next two clusters are created on the netw
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
             --network "nw02"
 ```
-AbsaOSS/k3d-action creates four identical clusters in two different bridge networks. 
+AbsaOSS/k3d-action creates four identical clusters in two different bridge networks.
 
 For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks%22),
 [Source](./.github/workflows/multi-cluster-two-piars.yaml)
