@@ -1,0 +1,19 @@
+name: Retrieving nodes right after we create cluster
+
+on:
+  [workflow_dispatch, push]
+jobs:
+  k3d-specified-k3d-version-demo:
+    name: Use specified k3d version
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        name: k3d-version-specified
+        with:
+          cluster-name: "k3d-version-specified"
+          k3d-version: v5.0.3
+          args: >-
+            --no-lb
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+      - run: k3d version | grep v5.0.3

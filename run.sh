@@ -25,7 +25,7 @@ CYAN=
 RED=
 NC=
 K3D_URL=https://raw.githubusercontent.com/rancher/k3d/main/install.sh
-K3D_VERSION=v5.1.0
+DEFAULT_K3D_VERSION=v5.1.0
 
 #######################
 #
@@ -44,6 +44,8 @@ usage(){
                         CLUSTER_NAME (Required) k3d cluster name.
 
                         ARGS (Optional) k3d arguments.
+
+                        K3D_VERSION (Optional) k3d version.
 EOF
 }
 
@@ -56,13 +58,14 @@ panic() {
 deploy(){
     local name=${CLUSTER_NAME}
     local arguments=${ARGS:-}
+    local k3dVersion=${K3D_VERSION:-${DEFAULT_K3D_VERSION}}
 
     if [[ -z "${CLUSTER_NAME}" ]]; then
       panic "CLUSTER_NAME must be set"
     fi
 
-    echo -e "${YELLOW}Downloading ${CYAN}k3d@${K3D_VERSION} ${NC}see: ${K3D_URL}"
-    curl --silent --fail ${K3D_URL} | TAG=${K3D_VERSION} bash
+    echo -e "${YELLOW}Downloading ${CYAN}k3d@${k3dVersion} ${NC}see: ${K3D_URL}"
+    curl --silent --fail ${K3D_URL} | TAG=${k3dVersion} bash
 
     echo -e "\existing_network${YELLOW}Deploy cluster ${CYAN}$name ${NC}"
     eval "k3d cluster create $name --wait $arguments"

@@ -40,6 +40,8 @@ AbsaOSS/k3d-action defines several input attributes and two outputs:
 
 - `args` (Optional) list of k3d arguments defined by [k3d command tree](https://k3d.io/usage/commands/)
 
+- `k3d-version` (Optional) version of k3d. If not set, will be used version from mapping below.
+
 ### Version mapping
 
 Implementation of additional features brings complexity and sometimes it may happen that extra feature is broken in special cases.
