@@ -27,6 +27,9 @@ inputs:
   args:
     description: "(Optional) Additional arguments to k3d cluster. see: https://k3d.io/usage/commands/"
     required: false
+  k3d-version:
+    description: "(Optional) Version of k3d"
+    required: false
 runs:
   using: composite
   steps:
@@ -36,3 +39,4 @@ runs:
       env:
         CLUSTER_NAME: ${{ inputs.cluster-name }}
         ARGS: ${{ inputs.args }}
+        K3D_VERSION: ${{ inputs.k3d-version }}

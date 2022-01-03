@@ -40,6 +40,8 @@ AbsaOSS/k3d-action defines several input attributes and two outputs:
 
 - `args` (Optional) list of k3d arguments defined by [k3d command tree](https://k3d.io/usage/commands/)
 
+- `k3d-version` (Optional) version of k3d. If not set, will be used version from mapping below.
+
 ### Version mapping
 
 Implementation of additional features brings complexity and sometimes it may happen that extra feature is broken in special cases.
@@ -54,8 +56,9 @@ To prevent potential issues, the `k3d` version is fixed according to the mapping
 | v1.5.0     |  [v4.4.7](https://github.com/rancher/k3d/releases/tag/v4.4.7) | [rancher/k3s:v1.21.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.21.2%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
 | v2.0.0     |  [v5.1.0](https://github.com/rancher/k3d/releases/tag/v5.1.0) | [rancher/k3s:v1.22.3+k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.22.3%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
 
-Starting from `k3d-action` `v1.4.0` users can explicitly set [`k3s` image version](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated) via [configuration](#config-file-support) or
-argument e.g.`--image docker.io/rancher/k3s:v1.20.4-k3s1` otherwise k3d uses default version accordng to the mapping above.
+Starting from `k3d-action` `v2.1.0` users can explicitly set k3d version via `k3d-version` input e.g. `k3d-version: v5.2.2` otherwise k3d uses default version according to the mapping above.
+Starting from `k3d-action` `v1.4.0` users can also explicitly set [`k3s` image version](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated) via [configuration](#config-file-support) or
+argument e.g.`--image docker.io/rancher/k3s:v1.20.4-k3s1` otherwise k3d uses default version according to the mapping above.
 
 For further k3s details see:
 - docker [rancher/k3s](https://hub.docker.com/r/rancher/k3s/tags?page=2&ordering=last_updated)
