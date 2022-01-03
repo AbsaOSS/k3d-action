@@ -55,6 +55,7 @@ To prevent potential issues, the `k3d` version is fixed according to the mapping
 | v1.4.0     |  [v4.4.1](https://github.com/rancher/k3d/releases/tag/v4.4.1) | [rancher/k3s:v1.20.8-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.8%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
 | v1.5.0     |  [v4.4.7](https://github.com/rancher/k3d/releases/tag/v4.4.7) | [rancher/k3s:v1.21.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.21.2%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
 | v2.0.0     |  [v5.1.0](https://github.com/rancher/k3d/releases/tag/v5.1.0) | [rancher/k3s:v1.22.3+k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.22.3%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
+| v2.1.0     |  [v5.2.2](https://github.com/rancher/k3d/releases/tag/v5.2.2) | [rancher/k3s:v1.22.3+k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.22.3%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
 
 Starting from `k3d-action` `v2.1.0` users can explicitly set k3d version via `k3d-version` input e.g. `k3d-version: v5.2.2` otherwise k3d uses default version according to the mapping above.
 Starting from `k3d-action` `v1.4.0` users can also explicitly set [`k3s` image version](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated) via [configuration](#config-file-support) or
