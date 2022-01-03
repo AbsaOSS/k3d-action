@@ -45,7 +45,8 @@ AbsaOSS/k3d-action defines several input attributes and two outputs:
 ### Version mapping
 
 Implementation of additional features brings complexity and sometimes it may happen that extra feature is broken in special cases.
-To prevent potential issues, the `k3d` version is fixed according to the mapping below:
+Because of that, `k3d-action` has fixed default, tested against compatibility `k3d` version.
+Starting from k3d-action v2.1.0 users can explicitly set k3d version via `k3d-version` input e.g. `k3d-version: v5.2.2` otherwise k3d uses default version according to the mapping above.
 
 | k3d-action |   k3d   |           k3s           |
 |:----------:|:-------:|:-----------------------:|

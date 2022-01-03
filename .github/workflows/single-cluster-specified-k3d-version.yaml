@@ -1,4 +1,4 @@
-name: Retrieving nodes right after we create cluster
+name: Use specified k3d version
 
 on:
   [workflow_dispatch, push]
