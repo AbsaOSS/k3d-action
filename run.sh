@@ -24,7 +24,7 @@ YELLOW=
 CYAN=
 RED=
 NC=
-K3D_URL=https://raw.githubusercontent.com/rancher/k3d/main/install.sh
+K3D_URL=https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh
 DEFAULT_K3D_VERSION=v5.2.2
 
 #######################
