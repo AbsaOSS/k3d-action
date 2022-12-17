@@ -1,4 +1,5 @@
 # AbsaOSS/k3d-action
+
 A GitHub Action to run lightweight ephemeral Kubernetes clusters during workflow.
 Fundamental advantage of this action is a full customization of embedded k3s clusters. In addition, it provides
 multi-cluster support.
@@ -6,11 +7,10 @@ multi-cluster support.
 - [Introduction](#introduction)
 - [Getting started](#getting-started)
   - [Inputs](#inputs)
-  - [Version mapping](#version-mapping)
-- [Single Cluster](#single-cluster)
-  - [Config file support](#config-file-support)
-- [Multi Cluster](#multi-cluster)
-  - [Multi Cluster setup](#multi-cluster-setup)
+  - [Version mapping and override](#version-mapping-and-override)
+- [Single cluster setup](#single-cluster-setup)
+- [Multi-cluster setup](#multi-cluster-setup)
+- [Config file support](#config-file-support)
 - [Private Registry](#private-registry)
 
 ## Introduction
@@ -40,34 +40,47 @@ AbsaOSS/k3d-action defines several input attributes and two outputs:
 
 - `args` (Optional) list of k3d arguments defined by [k3d command tree](https://k3d.io/usage/commands/)
 
-- `k3d-version` (Optional) version of k3d. If not set, will be used version from mapping below.
+- `k3d-version` (Optional) version of k3d. If not set, default version will be used from the [version mapping table](#version-mapping-and-override).
 
-### Version mapping
+### Version mapping and override
 
-Implementation of additional features brings complexity and sometimes it may happen that extra feature is broken in special cases.
-To prevent potential issues, the `k3d` version is fixed according to the mapping below:
+Implementation of additional features brings complexity and sometimes it may happen that external dependencies get broken.
+To prevent potential issues, `k3d` version is fixed according to the mapping below.
 
-| k3d-action |   k3d   |           k3s           |
-|:----------:|:-------:|:-----------------------:|
-| v1.1.0     |  [v3.4.0](https://github.com/rancher/k3d/releases/tag/v3.4.0) | [rancher/k3s:v1.20.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.2%2Bk3s1)|
-| v1.2.0     |  [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) | [rancher/k3s:v1.20.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.2%2Bk3s1)|
-| v1.3.0     |  [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) | [rancher/k3s:v1.20.4-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.4%2Bk3s1)|
-| v1.4.0     |  [v4.4.1](https://github.com/rancher/k3d/releases/tag/v4.4.1) | [rancher/k3s:v1.20.8-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.20.8%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
-| v1.5.0     |  [v4.4.7](https://github.com/rancher/k3d/releases/tag/v4.4.7) | [rancher/k3s:v1.21.2-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.21.2%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
-| v2.0.0     |  [v5.1.0](https://github.com/rancher/k3d/releases/tag/v5.1.0) | [rancher/k3s:v1.22.3+k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.22.3%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
-| v2.1.0     |  [v5.2.2](https://github.com/rancher/k3d/releases/tag/v5.2.2) | [rancher/k3s:v1.21.7-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.21.7%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
-| v2.2.0     |  [v5.3.0](https://github.com/k3d-io/k3d/releases/tag/v5.3.0) | [rancher/k3s:v1.22.6-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.22.6%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
-| v2.3.0     |  [v5.4.1](https://github.com/k3d-io/k3d/releases/tag/v5.4.1) | [rancher/k3s:v1.22.7-k3s1](https://github.com/k3s-io/k3s/releases/tag/v1.22.7%2Bk3s1) or [set image explicitly](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated)|
+| k3d-action |                             k3d                              |
+| :--------: | :----------------------------------------------------------: |
+|   v1.1.0   | [v3.4.0](https://github.com/rancher/k3d/releases/tag/v3.4.0) |
+|   v1.2.0   | [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) |
+|   v1.3.0   | [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) |
+|   v1.4.0   | [v4.4.1](https://github.com/rancher/k3d/releases/tag/v4.4.1) |
+|   v1.5.0   | [v4.4.7](https://github.com/rancher/k3d/releases/tag/v4.4.7) |
+|   v2.0.0   | [v5.1.0](https://github.com/rancher/k3d/releases/tag/v5.1.0) |
+|   v2.1.0   | [v5.2.2](https://github.com/rancher/k3d/releases/tag/v5.2.2) |
+|   v2.2.0   | [v5.3.0](https://github.com/k3d-io/k3d/releases/tag/v5.3.0)  |
+|   v2.3.0   | [v5.4.1](https://github.com/k3d-io/k3d/releases/tag/v5.4.1)  |
+|   v2.4.0   | [v5.4.6](https://github.com/k3d-io/k3d/releases/tag/v5.4.6)  |
 
-Starting from `k3d-action` `v2.1.0` users can explicitly set k3d version via `k3d-version` input e.g. `k3d-version: v5.2.2` otherwise k3d uses default version according to the mapping above.
-Starting from `k3d-action` `v1.4.0` users can also explicitly set [`k3s` image version](https://hub.docker.com/r/rancher/k3s/tags?page=1&ordering=last_updated) via [configuration](#config-file-support) or
-argument e.g.`--image docker.io/rancher/k3s:v1.20.4-k3s1` otherwise k3d uses default version according to the mapping above.
+Users can override the default `k3d` version with the `k3d-version:` action parameter
 
-For further k3s details see:
-- docker [rancher/k3s](https://hub.docker.com/r/rancher/k3s/tags?page=2&ordering=last_updated)
-- github [k3s/releases](https://github.com/k3s-io/k3s/releases)
+```yaml
+# example
+with:
+  k3d-version: v5.2.2
+```
 
-## Single Cluster
+Users can also override the default `k3s` image version, using `k3d` `--image` argument
+
+```yaml
+# example
+with:
+  args: --image docker.io/rancher/k3s:v1.20.4-k3s1
+```
+
+or the `image:` field in the [k3d configuration file](#config-file-support).
+
+Recent `k3s` image versions can be checked on the [k3.io project releases page](https://github.com/k3s-io/k3s/releases).
+
+## Single cluster setup
 Although AbsaOSS/k3d-action strongly supports multi-cluster. Single cluster scenarios are very popular. The minimum single-cluster
 configuration looks like this :
 ```yaml
@@ -101,55 +114,7 @@ disable default traefik and metrics.
 For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Single+cluster+on+default+network%22),
 [Source](./.github/workflows/single-cluster.yaml)
 
-### Config file support
-From v1.2.0 you can configure action via config files or mix arguments together with config files. This setup is useful when
-you want to share the configuration for local testing and testing within k3d-action.
-```yaml
-      - uses: ./
-        name: "Create single k3d Cluster"
-        with:
-          cluster-name: "test-cluster-1"
-          args: >-
-            --agents 1
-            --config=<path to config yaml>
-```
-All you need to do is to place configuration file somewhere into your project. However, keep in mind, that command line
-arguments will always take precedence over configuration, so the previous example will result in only one agent, not three as
-configured.
-```yaml
-apiVersion: k3d.io/v1alpha3
-kind: Simple
-image: docker.io/rancher/k3s:v1.20.5-k3s1
-servers: 1
-agents: 3 # The action will overwrite this by 1
-ports:
-  - port: 0.0.0.0:80:80
-    nodeFilters:
-      - agent:0:direct
-  - port: 0.0.0.0:443:443
-    nodeFilters:
-      - agent:0:direct
-  - port: 0.0.0.0:5053:53/udp
-    nodeFilters:
-      - agent:0:direct
-options:
-  k3d:
-    wait: true
-    timeout: "60s"
-    disableLoadbalancer: true
-  k3s:
-    extraArgs:
-      - arg: --no-deploy=traefik,servicelb,metrics-server
-        nodeFilters:
-          - server:*
-  kubeconfig:
-    updateDefaultKubeconfig: true
-    switchCurrentContext: true
-```
-For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Single+cluster+on+default+network+with+config%22),
-[Source action](./.github/workflows/single-cluster-config.yaml), [Source config](./.github/workflows/assets/1.yaml)
-
-## Multi Cluster
+## Multi-cluster setup
 k3d creates a bridge-network for each separate cluster or attaches the created cluster to an
 existing network.
 
@@ -158,7 +123,6 @@ named `k3d-test-cluster-1` with the range `172.18.0.0/16`. When you create a sec
 `test-cluster-2`, k3d automatically creates a network named `k3d-test-cluster-2` with a
 range of `172.19.0.0/16`. Other clusters will have ranges `172.20.0.0/16`,`172.21.0.0/16` etc.
 
-### Multi Cluster setup
 The following example creates a total of four clusters, the first two are created on
 the network `nw01, 172.18.0.0/16`, the next two clusters are created on the network
 `nw02, 172.19.0.0/16`.
@@ -220,6 +184,54 @@ AbsaOSS/k3d-action creates four identical clusters in two different bridge netwo
 
 For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Multi+cluster%3B+two+pairs+of+clusters+on+two+isolated+networks%22),
 [Source](./.github/workflows/multi-cluster-two-piars.yaml)
+
+## Config file support
+From v1.2.0 you can configure action via config files or mix arguments together with config files. This setup is useful when
+you want to share the configuration for local testing and testing within k3d-action.
+```yaml
+      - uses: ./
+        name: "Create single k3d Cluster"
+        with:
+          cluster-name: "test-cluster-1"
+          args: >-
+            --agents 1
+            --config=<path to config yaml>
+```
+All you need to do is to place configuration file somewhere into your project. However, keep in mind, that command line
+arguments will always take precedence over configuration, so the previous example will result in only one agent, not three as
+configured.
+```yaml
+apiVersion: k3d.io/v1alpha3
+kind: Simple
+image: docker.io/rancher/k3s:v1.20.5-k3s1
+servers: 1
+agents: 3 # The action will overwrite this by 1
+ports:
+  - port: 0.0.0.0:80:80
+    nodeFilters:
+      - agent:0:direct
+  - port: 0.0.0.0:443:443
+    nodeFilters:
+      - agent:0:direct
+  - port: 0.0.0.0:5053:53/udp
+    nodeFilters:
+      - agent:0:direct
+options:
+  k3d:
+    wait: true
+    timeout: "60s"
+    disableLoadbalancer: true
+  k3s:
+    extraArgs:
+      - arg: --no-deploy=traefik,servicelb,metrics-server
+        nodeFilters:
+          - server:*
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
+```
+For more details see: [Demo](https://github.com/AbsaOSS/k3d-action/actions?query=workflow%3A%22Single+cluster+on+default+network+with+config%22),
+[Source action](./.github/workflows/single-cluster-config.yaml), [Source config](./.github/workflows/assets/1.yaml)
 
 ## Private Registry
 

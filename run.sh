@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Absa Group Limited
+# Copyright 2022 Absa Group Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ CYAN=
 RED=
 NC=
 K3D_URL=https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh
-DEFAULT_K3D_VERSION=v5.4.1
+DEFAULT_K3D_VERSION=v5.4.6
 
 #######################
 #
