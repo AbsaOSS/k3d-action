@@ -9,7 +9,7 @@
 !.licignore
 !Makefile
 !run.sh
-!*.yml
+!*.yaml
 !Dockerfile
 
 # ...even if they are in subdirectories
