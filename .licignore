@@ -3,7 +3,7 @@
 *
 
 # But not these files...
-!action.yml
+!action.yaml
 !run.sh
 !Makefile
 
