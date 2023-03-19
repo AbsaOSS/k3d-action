@@ -48,7 +48,7 @@ Implementation of additional features brings complexity and sometimes it may hap
 To prevent potential issues, `k3d` version is fixed according to the mapping below.
 
 | k3d-action |                             k3d                              |
-| :--------: | :----------------------------------------------------------: |
+|:----------:|:------------------------------------------------------------:|
 |   v1.1.0   | [v3.4.0](https://github.com/rancher/k3d/releases/tag/v3.4.0) |
 |   v1.2.0   | [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) |
 |   v1.3.0   | [v4.2.0](https://github.com/rancher/k3d/releases/tag/v4.2.0) |
@@ -59,6 +59,7 @@ To prevent potential issues, `k3d` version is fixed according to the mapping bel
 |   v2.2.0   | [v5.3.0](https://github.com/k3d-io/k3d/releases/tag/v5.3.0)  |
 |   v2.3.0   | [v5.4.1](https://github.com/k3d-io/k3d/releases/tag/v5.4.1)  |
 |   v2.4.0   | [v5.4.6](https://github.com/k3d-io/k3d/releases/tag/v5.4.6)  |
+|   v2.5.0   | [v5.4.9](https://github.com/k3d-io/k3d/releases/tag/v5.4.9)  |
 
 Users can override the default `k3d` version with the `k3d-version:` action parameter
 
