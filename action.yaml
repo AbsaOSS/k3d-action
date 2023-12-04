@@ -33,7 +33,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: pyTooling/Actions/with-post-step@v0.4.6
+    - uses: gacts/run-and-post-run@v1
       with:
         main: |
           ${{ github.action_path }}/run.sh deploy
