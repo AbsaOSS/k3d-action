@@ -74,10 +74,15 @@ deploy(){
 
 teardown(){
     local name=${CLUSTER_NAME}
-
+    local arguments=${ARGS:-}
+    local k3dVersion=${K3D_VERSION:-${DEFAULT_K3D_VERSION}}
+    
     if [[ -z "${CLUSTER_NAME}" ]]; then
       panic "CLUSTER_NAME must be set"
     fi
+
+    echo -e "${YELLOW}Downloading ${CYAN}k3d@${k3dVersion} ${NC}see: ${K3D_URL}"
+    curl --silent --fail ${K3D_URL} | TAG=${k3dVersion} bash
 
     echo -e "\existing_network${YELLOW}Teardown cluster ${CYAN}$name ${NC}"
     eval "k3d cluster delete $name"
