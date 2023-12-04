@@ -80,7 +80,7 @@ teardown(){
     fi
 
     echo -e "\existing_network${YELLOW}Teardown cluster ${CYAN}$name ${NC}"
-    eval "k3d cluster delete $name
+    eval "k3d cluster delete $name"
 }
 
 # waits until all nodes are ready
