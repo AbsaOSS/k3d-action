@@ -72,6 +72,17 @@ deploy(){
     wait_for_nodes
 }
 
+teardown(){
+    local name=${CLUSTER_NAME}
+
+    if [[ -z "${CLUSTER_NAME}" ]]; then
+      panic "CLUSTER_NAME must be set"
+    fi
+
+    echo -e "\existing_network${YELLOW}Teardown cluster ${CYAN}$name ${NC}"
+    eval "k3d cluster delete $name
+}
+
 # waits until all nodes are ready
 wait_for_nodes(){
   echo -e "${YELLOW}wait until all agents are ready${NC}"
@@ -120,6 +131,9 @@ fi
 case "$1" in
     "deploy")
        deploy
+    ;;
+    "teardown")
+       teardown
     ;;
 #    "<put new command here>")
 #       command_handler
