@@ -35,7 +35,7 @@ runs:
   steps:
     - uses: gacts/run-and-post-run@v1
       with:
-        main: |
+        run: |
           ${{ github.action_path }}/run.sh deploy
         post: |
           ${{ github.action_path }}/run.sh teardown
