@@ -33,9 +33,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - id: main
-      shell: bash
-      run: ${{ github.action_path }}/run.sh deploy
+    - uses: pyTooling/Actions/with-post-step@v0.4.6
+      with:
+        main: |
+          ${{ github.action_path }}/run.sh deploy
+        post: |
+          ${{ github.action_path }}/run.sh teardown
       env:
         CLUSTER_NAME: ${{ inputs.cluster-name }}
         ARGS: ${{ inputs.args }}
