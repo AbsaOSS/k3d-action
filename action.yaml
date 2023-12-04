@@ -36,8 +36,14 @@ runs:
     - uses: gacts/run-and-post-run@v1
       with:
         main: |
+          export CLUSTER_NAME="${{ inputs.cluster-name }}"
+          export ARGS="${{ inputs.args }}"
+          export K3D_VERSION="${{ inputs.k3d-version }}"
           ${{ github.action_path }}/run.sh deploy
         post: |
+          export CLUSTER_NAME="${{ inputs.cluster-name }}"
+          export ARGS="${{ inputs.args }}"
+          export K3D_VERSION="${{ inputs.k3d-version }}"
           ${{ github.action_path }}/run.sh teardown
       env:
         CLUSTER_NAME: ${{ inputs.cluster-name }}
