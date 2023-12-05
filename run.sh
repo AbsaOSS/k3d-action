@@ -38,6 +38,7 @@ usage(){
   Usage: $(basename "$0") <COMMAND>
   Commands:
       deploy            deploy custom k3d cluster
+      teardown          teardown custom k3d cluster
 
   Environment variables:
       deploy
@@ -46,6 +47,8 @@ usage(){
                         ARGS (Optional) k3d arguments.
 
                         K3D_VERSION (Optional) k3d version.
+      teardown
+                        CLUSTER_NAME (Required) k3d cluster name.
 EOF
 }
 
@@ -70,6 +73,17 @@ deploy(){
     echo -e "\existing_network${YELLOW}Deploy cluster ${CYAN}$name ${NC}"
     eval "k3d cluster create $name --wait $arguments"
     wait_for_nodes
+}
+
+teardown(){
+    local name=${CLUSTER_NAME}
+
+    if [[ -z "${CLUSTER_NAME}" ]]; then
+      panic "CLUSTER_NAME must be set"
+    fi
+
+    echo -e "\existing_network${YELLOW}Teardown cluster ${CYAN}$name ${NC}"
+    eval "k3d cluster delete $name"
 }
 
 # waits until all nodes are ready
@@ -120,6 +134,9 @@ fi
 case "$1" in
     "deploy")
        deploy
+    ;;
+    "teardown")
+       teardown
     ;;
 #    "<put new command here>")
 #       command_handler
